@@ -1,0 +1,42 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Main/LevelEditor/LevelEditor.uss?fileID=7433441132597879392&amp;guid=ee7461ebeba464e93a16aa9b442b9583&amp;type=3#LevelEditor" />
+    <ui:VisualElement name="Main" style="flex-grow: 1;">
+        <ui:VisualElement name="Load" class="bordered-box" style="flex-grow: 0; flex-shrink: 0;">
+            <ui:Label tabindex="-1" text="Load" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Load" class="header" />
+            <ui:VisualElement name="Load_VE" style="flex-grow: 0; flex-direction: row-reverse; height: 30px;">
+                <ui:Button text="Load Level" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btn_Load" style="height: 25px; width: 125px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="MainTabRow_VE" style="flex-grow: 1; height: 40px; flex-shrink: 1; flex-direction: row;" />
+        <ui:VisualElement name="Main_VE" style="flex-grow: 1; width: 100%; height: 100%; opacity: 1;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="MainGrid_VE" class="bordered-box" style="flex-grow: 1;">
+        <ui:Label tabindex="-1" text="Grid" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Grid" class="header" />
+        <ui:VisualElement name="Setup_VE" style="flex-grow: 0; flex-direction: row; height: 25px;">
+            <ui:Vector2IntField label="Size" name="v2Int_Size" x="1" y="1" style="flex-grow: 1; height: 20px;" />
+            <ui:Button text="Setup Grid" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btn_Setup" style="flex-grow: 0; height: 25px; width: 125px;" />
+        </ui:VisualElement>
+        <ui:EnumField label="Color" type="Utilities.ColorType, Assembly-CSharp" value="None" name="enum_GridColor" style="height: 25px;" />
+        <ui:ScrollView name="Grid_SV" style="flex-grow: 1;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="MainDeck_VE" class="bordered-box" style="flex-grow: 1;">
+        <ui:Label tabindex="-1" text="Deck" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Deck" class="header" />
+        <ui:EnumField label="Color" type="Utilities.ColorType, Assembly-CSharp" value="None" name="enum_DeckColor" />
+        <ui:VisualElement name="DeckTabs_VE" style="flex-grow: 0; flex-direction: row; height: 50px; flex-shrink: 1;">
+            <ui:VisualElement name="DeckTabsRow_VE" style="flex-grow: 1; height: 35px; max-height: 35px; flex-direction: row;" />
+            <ui:Button text="+" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btn_AddDeckTab" style="width: 30px; height: 30px; -unity-font-style: bold; font-size: 25px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Deck_VE" style="flex-grow: 1;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="Options_VE" class="bordered-box" style="flex-grow: 0; flex-shrink: 0;">
+        <ui:Label tabindex="-1" text="Options" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Options" class="header" />
+        <ui:VisualElement name="LevelType_VE" style="flex-grow: 1; flex-direction: row;">
+            <ui:EnumField label="Enum" type="Utilities.LevelType, Assembly-CSharp" name="enum_LevelType" style="flex-grow: 1;" />
+            <ui:UnsignedIntegerField label="Time/Move Count" value="1" name="uintField_LevelTypeArgument" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Save" style="flex-grow: 1; flex-direction: row;">
+            <ui:UnsignedIntegerField label="Level No" value="1" name="txt_LevelNo" style="flex-grow: 1;" />
+            <ui:Button text="Save" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btn_Save" style="width: 125px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
