@@ -1,7 +1,10 @@
 using Fiber.Managers;
+using GamePlay.DeckSystem;
+using GamePlay.GridSystem;
 using TriInspector;
 using UnityEngine;
 using Utilities;
+using Grid = GamePlay.GridSystem.Grid;
 
 namespace GamePlay.Shapes
 {
@@ -14,14 +17,40 @@ namespace GamePlay.Shapes
 
 		[Title("References")]
 		[SerializeField] private MeshRenderer meshRenderer;
+		[SerializeField] private Collider col;
 
+		private ShapeCell currentShapeCellUnder;
+
+		public const float PLACE_SPEED = 10;
 		public static readonly float SIZE = 1;
+
+		public void Place()
+		{
+			var gridCell = Grid.Instance.GetCell(currentShapeCellUnder.Coordinates);
+		}
+
+		public ShapeCell GetCellUnder()
+		{
+			if (Physics.Raycast(transform.position, Vector3.down, out var hit, 100, Deck.ShapeCellLayerMask))
+			{
+				if (hit.rigidbody && hit.rigidbody.TryGetComponent(out ShapeCell shapeCell))
+				{
+					currentShapeCellUnder = shapeCell;
+					return shapeCell;
+				}
+			}
+
+			return null;
+		}
+
+		#region Setup
 
 		public void SetupGrid(Vector2Int coordinates, ColorType colorType)
 		{
 			Coordinates = coordinates;
 			ColorType = colorType;
 			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorData[ColorType];
+			col.enabled = true;
 		}
 
 		public void SetupShape(ColorType colorType, Vector2Int coordinates)
@@ -29,6 +58,9 @@ namespace GamePlay.Shapes
 			ColorType = colorType;
 			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorData[ColorType];
 			ShapeCoordinates = coordinates;
+			col.enabled = false;
 		}
+
+		#endregion
 	}
 }

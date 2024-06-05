@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using Fiber.Managers;
+using Fiber.Utilities;
 using Fiber.Utilities.Extensions;
 using GamePlay.Shapes;
 using LevelEditor;
@@ -10,35 +12,69 @@ using Utilities;
 
 namespace GamePlay.DeckSystem
 {
-	public class Deck : MonoBehaviour
+	public class Deck : Singleton<Deck>
 	{
+		public Shape CurrentShape { get; private set; }
+
+		[Title("Properties")]
 		[SerializeField, ReadOnly] private List<Shape> shapes = new List<Shape>();
 
 		[Title("References")]
 		[SerializeField] private Transform spawnPoint;
-		
+
 		[Title("Prefabs")]
 		[SerializeField] private Shape shapePrefab;
 		[SerializeField] private ShapeCell shapeCellPrefab;
 
-		private Queue<Shape> shapeQueue = new Queue<Shape>();
+		private readonly Queue<Shape> shapeQueue = new Queue<Shape>();
+
+		public static LayerMask ShapeCellLayerMask;
+
+		private void Awake()
+		{
+			ShapeCellLayerMask = LayerMask.GetMask("ShapeCell");
+		}
 
 		private void OnEnable()
 		{
 			LevelManager.OnLevelStart += OnLevelStarted;
+			Shape.OnPlace += OnShapePlaced;
 		}
 
 		private void OnDisable()
 		{
 			LevelManager.OnLevelStart -= OnLevelStarted;
+			Shape.OnPlace -= OnShapePlaced;
 		}
 
 		private void OnLevelStarted()
 		{
-			SpawnShapes();
+			LoadShapes();
+
+			SpawnShape();
 		}
 
-		private void SpawnShapes(bool shuffle = false)
+		private void OnShapePlaced(Shape shape)
+		{
+			CurrentShape = null;
+
+			SpawnShape();
+		}
+
+		private void SpawnShape()
+		{
+			if (!shapeQueue.TryDequeue(out var shape))
+			{
+				LoadShapes(true);
+				shape = shapeQueue.Dequeue();
+			}
+
+			shape.gameObject.SetActive(true);
+			shape.transform.position = spawnPoint.position;
+			shape.transform.DOLocalMove(Vector3.zero, .25f).SetDelay(0.5f).SetEase(Ease.InOutSine).OnComplete(() => { CurrentShape = shape; });
+		}
+
+		private void LoadShapes(bool shuffle = false)
 		{
 			var tempShapes = new List<Shape>(shapes);
 			if (shuffle)
@@ -59,62 +95,66 @@ namespace GamePlay.DeckSystem
 			foreach (var deckCellInfos in deckCellInfosList)
 			{
 				var middle = FindMiddle(deckCellInfos);
+				Debug.Log(middle);
 				var shape = (Shape)PrefabUtility.InstantiatePrefab(shapePrefab, transform);
 
-				for (int x = 0; x < deckCellInfos.GetLength(1); x++)
+				for (int y = 0; y < deckCellInfos.GetLength(1); y++)
 				{
-					for (int y = 0; y < deckCellInfos.GetLength(0); y++)
+					for (int x = 0; x < deckCellInfos.GetLength(0); x++)
 					{
 						if (deckCellInfos[x, y].ColorType == ColorType.None) continue;
 
 						var shapeCell = (ShapeCell)PrefabUtility.InstantiatePrefab(shapeCellPrefab, shape.transform);
-						shape.AddShapeCell(shapeCell);
+						shape.ShapeCells.Add(shapeCell);
 
 						int coorX = x - middle.firstLeft;
 						int coorY = y - middle.firstTop;
 						shapeCell.transform.localPosition = new Vector3(coorX - (middle.width / 2f - ShapeCell.SIZE / 2f), -(coorY - (middle.height / 2f - ShapeCell.SIZE / 2f)));
-						shapeCell.SetupShape(deckCellInfos[x, y].ColorType, new Vector2Int(-coorX, -coorY));
+						shapeCell.SetupShape(deckCellInfos[x, y].ColorType, new Vector2Int(coorX, coorY));
 					}
 				}
 
+				shape.ShapeCells.Reverse();
 				shape.Setup(middle.width, middle.height);
+				shape.gameObject.SetActive(false);
 				shapes.Add(shape);
 			}
 		}
 
-		private (float height, int firstLeft, float width, int firstTop) FindMiddle(DeckCellInfo[,] cells)
+		private (float width, int firstLeft, float height, int firstTop) FindMiddle(DeckCellInfo[,] cells)
 		{
-			int height = 0;
-			int firstLeft = 999;
-			for (int y = 0; y < cells.GetLength(1); y++)
+			int count = cells.GetLength(0);
+			int w = 0;
+			int top = int.MaxValue;
+			for (int x = 0; x < count; x++)
 			{
-				for (int x = 0; x < cells.GetLength(0); x++)
+				for (int y = 0; y < count; y++)
 				{
-					if (cells[y, x].ColorType == ColorType.None) continue;
-					height++;
+					if (cells[x, y].ColorType == ColorType.None) continue;
+					w++;
 
-					if (x < firstLeft)
-						firstLeft = x;
+					if (y < top)
+						top = y;
 					break;
 				}
 			}
 
-			int width = 0;
-			int firstTop = 999;
-			for (int x = 0; x < cells.GetLength(1); x++)
+			int h = 0;
+			int left = 999;
+			for (int y = 0; y < count; y++)
 			{
-				for (int y = 0; y < cells.GetLength(0); y++)
+				for (int x = 0; x < count; x++)
 				{
-					if (cells[y, x].ColorType == ColorType.None) continue;
-					width++;
+					if (cells[x, y].ColorType == ColorType.None) continue;
+					h++;
 
-					if (y < firstTop)
-						firstTop = y;
+					if (x < left)
+						left = x;
 					break;
 				}
 			}
 
-			return (height, firstLeft, width, firstTop);
+			return (w, left, h, top);
 		}
 #endif
 

@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17e8851ca1ce4367b6d67cf248f46fab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <LevelType>k__BackingField: 0
+  <LevelTypeArgument>k__BackingField: 0
   grid: {fileID: 7025445309251605518}
   deck: {fileID: 361693440741865609}
 --- !u!1001 &3685346552130835343
@@ -66,7 +68,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5454562970662327520, guid: 32afdda9b716e4282bb8f7cb4b6f4017, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5454562970662327520, guid: 32afdda9b716e4282bb8f7cb4b6f4017, type: 3}
       propertyPath: m_LocalPosition.z

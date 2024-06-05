@@ -15,6 +15,8 @@ namespace GamePlay.GridSystem
 		[Title("Properties")]
 		[SerializeField, ReadOnly] private GridCellMatrix gridCells;
 		public GridCellMatrix GridCells => gridCells;
+		[SerializeField] private Vector2 offset;
+		public Vector2 Offset => offset;
 
 		[Title("Grid Settings")]
 		[SerializeField] private Vector2 cellSize = new Vector2Int(1, 1);
@@ -72,6 +74,7 @@ namespace GamePlay.GridSystem
 
 			var xOffset = (cellSize.x * width + xSpacing * (width - 1)) / 2f - cellSize.x / 2f;
 			var yOffset = (cellSize.y * height + ySpacing * (height - 1)) / 2f - cellSize.y / 2f;
+			offset = new Vector2(xOffset, yOffset);
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
@@ -88,6 +91,7 @@ namespace GamePlay.GridSystem
 					{
 						var shapeCell = (ShapeCell)PrefabUtility.InstantiatePrefab(shapeCellPrefab, cell.transform);
 						shapeCell.SetupGrid(new Vector2Int(x, y), cellInfo.ColorType);
+						cell.CurrentShapeCell = shapeCell;
 					}
 				}
 			}
@@ -139,6 +143,16 @@ namespace GamePlay.GridSystem
 		}
 
 		#endregion
+
+		public GridCell GetCell(int x, int y)
+		{
+			return gridCells[x, y];
+		}
+
+		public GridCell GetCell(Vector2Int coordinates)
+		{
+			return GetCell(coordinates.x, coordinates.y);
+		}
 
 		public GridCell TryToGetCell(int x, int y)
 		{

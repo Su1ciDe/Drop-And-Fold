@@ -349,7 +349,7 @@ namespace LevelEditor
 		#region Deck Grid
 
 		private bool hasDeckSetup = false;
-		private List<DeckCellInfo[,]> deckCells;
+		private List<DeckCellInfo[,]> deckCells = new List<DeckCellInfo[,]>();
 		private Dictionary<string, List<Vector2Int>> shapePairs = new Dictionary<string, List<Vector2Int>>();
 		private readonly Vector2Int deckSize = new Vector2Int(4, 4);
 
