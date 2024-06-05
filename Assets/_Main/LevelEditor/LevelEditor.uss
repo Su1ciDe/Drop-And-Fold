@@ -121,6 +121,15 @@
     transition: 0.25s all;
 }
 
+.tab-close-button {
+    height: 30px;
+    flex-grow: 0;
+    align-self: flex-end;
+    border-width: 0;
+    background-image: none;
+    background-color: rgba(1, 1, 1, 0);
+}
+
 .holder {
     height: 40px;
     padding: 10px;

@@ -158,17 +158,28 @@ namespace LevelEditor
 			public int Index;
 			public readonly VisualElement VisualElement;
 			public readonly Button TabButton;
+			public readonly Button CloseButton;
 
 			public Tab(int index, VisualElement visualElement, Button tabButton)
 			{
 				Index = index;
 				VisualElement = visualElement;
 				TabButton = tabButton;
+				CloseButton = null;
+			}
+
+			public Tab(int index, VisualElement visualElement, Button tabButton, Button closeButton)
+			{
+				Index = index;
+				VisualElement = visualElement;
+				TabButton = tabButton;
+				CloseButton = closeButton;
 			}
 		}
 
-		private void SelectTab(int index, IReadOnlyList<Tab> tabs)
+		private void SelectTab(Button button, VisualElement parent, IReadOnlyList<Tab> tabs)
 		{
+			var index = parent.IndexOf(button);
 			for (var i = 0; i < tabs.Count; i++)
 			{
 				var tab = tabs[i];
@@ -189,6 +200,22 @@ namespace LevelEditor
 			}
 		}
 
+		private void CloseTab(Button button, VisualElement parent, ref List<Tab> tabs, string tabName)
+		{
+			var index = parent.IndexOf(button);
+			var closedTab = tabs[index];
+			closedTab.VisualElement.RemoveFromHierarchy();
+			closedTab.TabButton.RemoveFromHierarchy();
+			tabs.RemoveAt(index);
+
+			for (var i = 0; i < tabs.Count; i++)
+			{
+				var tab = tabs[i];
+				tab.Index = i;
+				tab.TabButton.text = tabName + " " + (i + 1);
+			}
+		}
+
 		#region MainTabs
 
 		private List<Tab> mainTabs = new List<Tab>();
@@ -197,7 +224,7 @@ namespace LevelEditor
 		{
 			AddMainTab();
 
-			SelectTab(0, mainTabs);
+			SelectTab(mainTabs[0].TabButton, MainTabRow_VE, mainTabs);
 		}
 
 		private void AddMainTab()
@@ -205,7 +232,7 @@ namespace LevelEditor
 			var gridButton = EditorUtilities.CreateVisualElement<Button>("tab-button");
 			gridButton.focusable = false;
 			gridButton.text = "Grid";
-			gridButton.clickable.clicked += () => SelectTab(0, mainTabs);
+			gridButton.clickable.clicked += () => SelectTab(gridButton, MainTabRow_VE, mainTabs);
 			MainTabRow_VE.Add(gridButton);
 			var ve1 = EditorUtilities.CreateVisualElement<VisualElement>("main");
 			Main_VE.Add(ve1);
@@ -214,7 +241,7 @@ namespace LevelEditor
 			var deckButton = EditorUtilities.CreateVisualElement<Button>("tab-button");
 			deckButton.focusable = false;
 			deckButton.text = "Deck";
-			deckButton.clickable.clicked += () => SelectTab(1, mainTabs);
+			deckButton.clickable.clicked += () => SelectTab(deckButton, MainTabRow_VE, mainTabs);
 			MainTabRow_VE.Add(deckButton);
 			var ve2 = EditorUtilities.CreateVisualElement<VisualElement>("main");
 			Main_VE.Add(ve2);
@@ -231,24 +258,34 @@ namespace LevelEditor
 		{
 			AddDeckTab();
 
-			SelectTab(0, deckTabs);
+			SelectTab(deckTabs[0].TabButton, DeckTabsRow_VE, deckTabs);
 		}
 
 		private void AddDeckTab()
 		{
+			const string tabName = "Deck";
 			int tabCount = deckTabs.Count;
 
 			var button = EditorUtilities.CreateVisualElement<Button>("tab-button");
 			button.focusable = false;
-			button.text = "Deck " + (tabCount + 1);
-			button.clickable.clicked += () => SelectTab(tabCount, deckTabs);
+			button.text = tabName + " " + (tabCount + 1);
 
+			var closeButton = EditorUtilities.CreateVisualElement<Button>("tab-close-button");
+			closeButton.focusable = false;
+			closeButton.text = "X";
+
+			button.Add(closeButton);
 			DeckTabsRow_VE.Add(button);
 
 			var grid = EditorUtilities.CreateVisualElement<VisualElement>("grid");
+
 			Deck_VE.Add(grid);
 
-			deckTabs.Add(new Tab(tabCount, grid, button));
+			var tab = new Tab(tabCount, grid, button, closeButton);
+			deckTabs.Add(tab);
+
+			button.clickable.clicked += () => SelectTab(button, DeckTabsRow_VE, deckTabs);
+			closeButton.clickable.clicked += () => CloseTab(button, DeckTabsRow_VE, ref deckTabs, tabName);
 
 			if (hasDeckSetup)
 				AddDeckGrid(deckTabs.Count - 1);
