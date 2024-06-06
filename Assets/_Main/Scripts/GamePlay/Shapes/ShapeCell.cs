@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Fiber.Managers;
+using Fiber.Utilities;
 using GamePlay.GridSystem;
 using GamePlay.DeckSystem;
 using TriInspector;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
 using Utilities;
@@ -59,7 +61,8 @@ namespace GamePlay.Shapes
 				}
 			}
 
-			Drop(cellAbove);
+			if (cellAbove)
+				Drop(cellAbove);
 		}
 
 		public void Drop(GridCell cellToPlace)
@@ -102,6 +105,7 @@ namespace GamePlay.Shapes
 			}
 
 			yield return Fold(neighbours);
+			// TODO: destroy neighbour cells and this cell
 
 			OnFoldComplete?.Invoke(neighbours.Count());
 		}
@@ -114,9 +118,18 @@ namespace GamePlay.Shapes
 			}
 		}
 
+		private const string SEPARATOR_TAG = "Separator";
+
 		private Tween FoldTo(Vector3 position)
 		{
-			return transform.DOMove(position, FOLD_DURATION).SetEase(Ease.Linear);
+			var middlePoint = (position + transform.position) / 2f;
+			var separator = ObjectPooler.Instance.Spawn(SEPARATOR_TAG, middlePoint, Quaternion.identity);
+			transform.SetParent(separator.transform);
+
+			var dir = (position - transform.position).normalized;
+			var dirCrossed = Vector3.Cross(dir, Vector3.forward);
+
+			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetEase(Ease.Linear).OnComplete(() => { ObjectPooler.Instance.Release(separator, SEPARATOR_TAG); });
 		}
 
 		public ShapeCell GetCellUnder()

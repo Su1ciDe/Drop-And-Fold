@@ -13,7 +13,7 @@ namespace Fiber.Utilities
 			{
 				lock (_lock)
 				{
-					if (!instance) instance = FindAnyObjectByType<T>();
+					if (!instance) instance = FindAnyObjectByType<T>(FindObjectsInactive.Exclude);
 					return instance;
 				}
 			}

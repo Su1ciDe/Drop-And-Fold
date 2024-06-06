@@ -28,10 +28,15 @@ namespace GamePlay.GridSystem
 		[SerializeField] private GridCell cellPrefab;
 		[SerializeField] private ShapeCell shapeCellPrefab;
 
+		private void Start()
+		{
+			// StartCoroutine(Rearrange());
+		}
+
 		private void OnEnable()
 		{
 			LevelManager.OnLevelLoad += OnLevelLoaded;
-			ShapeCell.OnFoldComplete +=OnFoldComplete;
+			ShapeCell.OnFoldComplete += OnFoldComplete;
 		}
 
 		private void OnDisable()
@@ -52,18 +57,41 @@ namespace GamePlay.GridSystem
 		}
 
 		private Coroutine rearrangeCoroutine;
+
 		public IEnumerator Rearrange()
 		{
+			var width = gridCells.GetLength(0);
+			var height = gridCells.GetLength(1);
+
 			IsRearranging = true;
-			yield return null;
-			for (int y = gridCells.GetLength(1) - 1; y >= 0; y--)
+			yield return new WaitForSeconds(0.55f);
+			
+			for (int y = height - 1; y >= 0; y--)
 			{
-				for (int x = 0; x < gridCells.GetLength(0); x++)
+				for (int x = 0; x < width; x++)
 				{
-					var shapeCell = gridCells[x, y].CurrentShapeCell; 
+					var shapeCell = gridCells[x, y].CurrentShapeCell;
 					if (!shapeCell) continue;
 					yield return new WaitUntil(() => !shapeCell.IsBusy);
 
+					var yCoor = height;
+					GridCell cellUnder = null;
+					while (cellUnder is null)
+					{
+						yCoor--;
+						if (yCoor < 0 || yCoor.Equals(shapeCell.Coordinates.y))
+							break;
+
+						cellUnder = TryToGetCell(shapeCell.Coordinates.x, yCoor);
+						if (cellUnder?.CurrentShapeCell)
+						{
+							cellUnder = null;
+							continue;
+						}
+					}
+
+					if (cellUnder && !cellUnder.Coordinates.Equals(shapeCell.Coordinates))
+						shapeCell.Drop(cellUnder);
 				}
 			}
 
