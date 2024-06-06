@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Fiber.Managers;
 using Fiber.Utilities;
 using Fiber.LevelSystem;
+using Models;
 using ScriptableObjects;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
@@ -51,6 +52,8 @@ namespace LevelEditor
 		private Button btn_AddDeckTab;
 
 		// Options
+		private VisualElement Goal_VE;
+		private ListView listView_Goal;
 		private EnumField enum_LevelType;
 		private UnsignedIntegerField uintField_LevelTypeArgument;
 		private UnsignedIntegerField txt_LevelNo;
@@ -59,6 +62,7 @@ namespace LevelEditor
 		#endregion
 
 		private Level loadedLevel;
+		private List<Goal> goals = new List<Goal>();
 
 		private const float CELL_SIZE = 60;
 		private const float PIECE_SIZE = 1;
@@ -88,6 +92,7 @@ namespace LevelEditor
 			InitDeckTabs();
 
 			SetupElements();
+			SetupGoal();
 
 			EditorCoroutineUtility.StartCoroutine(Wait(), this);
 			return;
@@ -136,6 +141,7 @@ namespace LevelEditor
 			btn_AddDeckTab.clickable.clicked += AddDeckTab;
 
 			// Options
+			Goal_VE = rootVisualElement.Q<VisualElement>(nameof(Goal_VE));
 			enum_LevelType = rootVisualElement.Q<EnumField>(nameof(enum_LevelType));
 			uintField_LevelTypeArgument = rootVisualElement.Q<UnsignedIntegerField>(nameof(uintField_LevelTypeArgument));
 			txt_LevelNo = rootVisualElement.Q<UnsignedIntegerField>(nameof(txt_LevelNo));
@@ -149,6 +155,63 @@ namespace LevelEditor
 			mainTabs[0].VisualElement.Add(MainGrid_VE);
 			// Deck
 			mainTabs[1].VisualElement.Add(MainDeck_VE);
+		}
+
+		private void SetupGoal()
+		{
+			listView_Goal = new ListView(goals)
+			{
+				headerTitle = "Gaols",
+				showFoldoutHeader = true,
+				virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+				showBoundCollectionSize = true,
+				reorderable = false,
+				showAddRemoveFooter = true,
+				makeItem = () =>
+				{
+					var elevatorDataVisualElement = new GoalDataVisualElement();
+					var enumColor = elevatorDataVisualElement.Q<EnumField>("enum_Color");
+					int j = 0;
+					if (enumColor.userData is not null)
+					{
+						j = (int)enumColor.userData;
+						enumColor.value = goals[j].ColorType;
+					}
+
+					var amount = elevatorDataVisualElement.Q<UnsignedIntegerField>("uintField_GoalAmount");
+					int i = 0;
+					if (amount.userData is not null)
+					{
+						i = (int)amount.userData;
+						amount.value = (uint)goals[i].Amount;
+					}
+
+					enumColor.RegisterValueChangedCallback(evt =>
+					{
+						amount.style.backgroundColor = enumColor.style.backgroundColor = colorDataSO.ColorData[(ColorType)evt.newValue].color;
+
+						goals[(int)enumColor.userData].ColorType = (ColorType)evt.newValue;
+					});
+					amount.RegisterValueChangedCallback(evt => goals[(int)amount.userData].Amount = (int)evt.newValue);
+
+					return elevatorDataVisualElement;
+				},
+				bindItem = (e, i) =>
+				{
+					goals[i] ??= new Goal();
+
+					var enumColor = e.Q<EnumField>("enum_Color");
+					var amount = e.Q<UnsignedIntegerField>("uintField_GoalAmount");
+					amount.userData = i;
+					enumColor.userData = i;
+					amount.value = (uint)goals[i].Amount;
+					enumColor.value = goals[i].ColorType;
+
+					e.RegisterCallback<ChangeEvent<Goal>>(value => goals[i] = value.newValue);
+				},
+			};
+
+			Goal_VE.Add(listView_Goal);
 		}
 
 		#region Tabs
@@ -232,6 +295,8 @@ namespace LevelEditor
 			var gridButton = EditorUtilities.CreateVisualElement<Button>("tab-button");
 			gridButton.focusable = false;
 			gridButton.text = "Grid";
+			gridButton.style.fontSize = 20;
+			gridButton.style.unityFontStyleAndWeight = FontStyle.Bold;
 			gridButton.clickable.clicked += () => SelectTab(gridButton, MainTabRow_VE, mainTabs);
 			MainTabRow_VE.Add(gridButton);
 			var ve1 = EditorUtilities.CreateVisualElement<VisualElement>("main");
@@ -241,6 +306,8 @@ namespace LevelEditor
 			var deckButton = EditorUtilities.CreateVisualElement<Button>("tab-button");
 			deckButton.focusable = false;
 			deckButton.text = "Deck";
+			deckButton.style.fontSize = 20;
+			deckButton.style.unityFontStyleAndWeight = FontStyle.Bold;
 			deckButton.clickable.clicked += () => SelectTab(deckButton, MainTabRow_VE, mainTabs);
 			MainTabRow_VE.Add(deckButton);
 			var ve2 = EditorUtilities.CreateVisualElement<VisualElement>("main");

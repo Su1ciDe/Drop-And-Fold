@@ -14,7 +14,7 @@
     margin-bottom: 5px;
 }
 
-.unity-toggle {
+.toggle {
     height: 150px;
     width: 150px;
     background-size: 145px;
@@ -23,13 +23,13 @@
     transition: 0.2s all;
 }
 
-.unity-toggle:checked {
+.toggle:checked {
     border-radius: 5px;
     border-width: 4px;
     border-color: red;
 }
 
-.unity-toggle Label {
+.toggle Label {
     -unity-font-style: bold;
     font-size: 18px;
     color: white;

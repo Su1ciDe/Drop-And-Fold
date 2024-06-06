@@ -32,7 +32,7 @@ namespace GamePlay.Shapes
 
 		public static readonly float SIZE = 1;
 		private const float PLACE_SPEED = 15;
-		private const float FOLD_DURATION = .5f;
+		public static float FOLD_DURATION = .5f;
 
 		public static event UnityAction<int> OnFoldComplete; // int foldCount 
 

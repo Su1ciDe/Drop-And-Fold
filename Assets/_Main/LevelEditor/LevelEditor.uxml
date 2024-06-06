@@ -31,8 +31,9 @@
     </ui:VisualElement>
     <ui:VisualElement name="Options_VE" class="bordered-box" style="flex-grow: 0; flex-shrink: 0;">
         <ui:Label tabindex="-1" text="Options" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Options" class="header" />
+        <ui:VisualElement name="Goal_VE" style="flex-grow: 1;" />
         <ui:VisualElement name="LevelType_VE" style="flex-grow: 1; flex-direction: row;">
-            <ui:EnumField label="Enum" type="Utilities.LevelType, Assembly-CSharp" name="enum_LevelType" style="flex-grow: 1;" />
+            <ui:EnumField label="Level Type" type="Utilities.LevelType, Assembly-CSharp" name="enum_LevelType" style="flex-grow: 1;" />
             <ui:UnsignedIntegerField label="Time/Move Count" value="1" name="uintField_LevelTypeArgument" style="flex-grow: 1;" />
         </ui:VisualElement>
         <ui:VisualElement name="Separator" class="separator" />
