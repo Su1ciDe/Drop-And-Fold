@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Fiber.Managers;
 using Fiber.Utilities;
@@ -15,8 +16,10 @@ namespace GamePlay.GridSystem
 		[Title("Properties")]
 		[SerializeField, ReadOnly] private GridCellMatrix gridCells;
 		public GridCellMatrix GridCells => gridCells;
-		[SerializeField] private Vector2 offset;
+		[SerializeField, ReadOnly] private Vector2 offset;
 		public Vector2 Offset => offset;
+
+		public bool IsRearranging { get; set; }
 
 		[Title("Grid Settings")]
 		[SerializeField] private Vector2 cellSize = new Vector2Int(1, 1);
@@ -28,6 +31,7 @@ namespace GamePlay.GridSystem
 		private void OnEnable()
 		{
 			LevelManager.OnLevelLoad += OnLevelLoaded;
+			ShapeCell.OnFoldComplete +=OnFoldComplete;
 		}
 
 		private void OnDisable()
@@ -37,6 +41,34 @@ namespace GamePlay.GridSystem
 
 		private void OnLevelLoaded()
 		{
+		}
+
+		private void OnFoldComplete(int count)
+		{
+			if (rearrangeCoroutine is not null)
+				StopCoroutine(rearrangeCoroutine);
+
+			rearrangeCoroutine = StartCoroutine(Rearrange());
+		}
+
+		private Coroutine rearrangeCoroutine;
+		public IEnumerator Rearrange()
+		{
+			IsRearranging = true;
+			yield return null;
+			for (int y = gridCells.GetLength(1) - 1; y >= 0; y--)
+			{
+				for (int x = 0; x < gridCells.GetLength(0); x++)
+				{
+					var shapeCell = gridCells[x, y].CurrentShapeCell; 
+					if (!shapeCell) continue;
+					yield return new WaitUntil(() => !shapeCell.IsBusy);
+
+				}
+			}
+
+			IsRearranging = false;
+			rearrangeCoroutine = null;
 		}
 
 		#region Neighbours
@@ -59,6 +91,22 @@ namespace GamePlay.GridSystem
 				neighbourList.Add(gridCells[currentCell.X - 1, currentCell.Y]);
 
 			return neighbourList;
+		}
+
+		public IEnumerable<ShapeCell> GetSameNeighbours(GridCell currentCell)
+		{
+			// Up
+			if (currentCell.Y - 1 >= 0 && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X, currentCell.Y - 1].CurrentShapeCell?.ColorType)
+				yield return gridCells[currentCell.X, currentCell.Y - 1].CurrentShapeCell;
+			// Right
+			if (currentCell.X + 1 < GridCells.GetLength(0) && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X + 1, currentCell.Y].CurrentShapeCell?.ColorType)
+				yield return gridCells[currentCell.X + 1, currentCell.Y].CurrentShapeCell;
+			// Down
+			if (currentCell.Y + 1 < gridCells.GetLength(1) && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X, currentCell.Y + 1].CurrentShapeCell?.ColorType)
+				yield return gridCells[currentCell.X, currentCell.Y + 1].CurrentShapeCell;
+			// Left 
+			if (currentCell.X - 1 >= 0 && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X - 1, currentCell.Y].CurrentShapeCell?.ColorType)
+				yield return gridCells[currentCell.X - 1, currentCell.Y].CurrentShapeCell;
 		}
 
 		#endregion

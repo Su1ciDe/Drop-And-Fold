@@ -61,6 +61,8 @@ namespace GamePlay.Shapes
 
 		private GridCell FindHighestCell()
 		{
+			if (touchingGridCells is null || touchingGridCells.Count <= 0) return null;
+			
 			var highestCell = touchingGridCells[0];
 			for (var i = 1; i < touchingGridCells.Count; i++)
 			{
@@ -77,7 +79,7 @@ namespace GamePlay.Shapes
 		{
 			SetHighlights(false);
 			var highestCell = FindHighestCell();
-			if (highestCell.Y >= height)
+			if (highestCell?.Y >= height)
 			{
 				// snap to grid
 				var firstCell = ShapeCells[0];
@@ -88,14 +90,11 @@ namespace GamePlay.Shapes
 				transform.position = new Vector3(posX, Grid.Instance.Offset.y + (height * ShapeCell.SIZE) / 2f + ShapeCell.SIZE / 2f, transform.position.z);
 
 				// Place cells
+				// Note: This is Bottom to Top 
 				for (var i = 0; i < ShapeCells.Count; i++)
 				{
 					ShapeCells[i].Place();
 				}
-			}
-			else
-			{
-				// Fail
 			}
 
 			touchingGridCells.Clear();
