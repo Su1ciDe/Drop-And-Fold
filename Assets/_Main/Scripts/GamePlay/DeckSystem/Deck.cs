@@ -114,6 +114,7 @@ namespace GamePlay.DeckSystem
 					}
 				}
 
+				// Reverse the cell list, because we need to check if it can fold from bottom first
 				shape.ShapeCells.Reverse();
 				shape.Setup(middle.width, middle.height);
 				shape.gameObject.SetActive(false);
