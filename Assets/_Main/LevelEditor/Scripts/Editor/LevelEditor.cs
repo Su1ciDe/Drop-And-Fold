@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Fiber.Managers;
 using Fiber.Utilities;
 using Fiber.LevelSystem;
+using GamePlay.Shapes;
 using Models;
 using ScriptableObjects;
 using Unity.EditorCoroutines.Editor;
@@ -63,9 +64,6 @@ namespace LevelEditor
 
 		private Level loadedLevel;
 		private List<Goal> goals = new List<Goal>();
-
-		private const float CELL_SIZE = 60;
-		private const float PIECE_SIZE = 1;
 
 		#region Paths
 
@@ -130,7 +128,7 @@ namespace LevelEditor
 			MainGrid_VE = rootVisualElement.Q<VisualElement>(nameof(MainGrid_VE));
 			Grid_SV = rootVisualElement.Q<ScrollView>(nameof(Grid_SV));
 			enum_GridColor = rootVisualElement.Q<EnumField>(nameof(enum_GridColor));
-			enum_GridColor.RegisterValueChangedCallback(evt => { enum_GridColor.style.backgroundColor = colorDataSO.ColorData[(ColorType)evt.newValue].color; });
+			enum_GridColor.RegisterValueChangedCallback(evt => { enum_GridColor.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)evt.newValue].Material.color; });
 
 			// Deck
 			MainDeck_VE = rootVisualElement.Q<VisualElement>(nameof(MainDeck_VE));
@@ -188,7 +186,7 @@ namespace LevelEditor
 
 					enumColor.RegisterValueChangedCallback(evt =>
 					{
-						amount.style.backgroundColor = enumColor.style.backgroundColor = colorDataSO.ColorData[(ColorType)evt.newValue].color;
+						amount.style.backgroundColor = enumColor.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)evt.newValue].Material.color;
 
 						goals[(int)enumColor.userData].ColorType = (ColorType)evt.newValue;
 					});
@@ -400,8 +398,8 @@ namespace LevelEditor
 			if (e.button.Equals(0)) // Left click - Place
 			{
 				cellInfo.ColorType = (ColorType)enum_GridColor.value;
-				cellInfo.Color = colorDataSO.ColorData[(ColorType)enum_GridColor.value].color;
-				cellInfo.Button.style.backgroundColor = colorDataSO.ColorData[(ColorType)enum_GridColor.value].color;
+				cellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_GridColor.value].Material.color;
+				cellInfo.Button.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)enum_GridColor.value].Material.color;
 			}
 			else if (e.button.Equals(1)) // Right click - Delete
 			{
@@ -469,8 +467,8 @@ namespace LevelEditor
 			if (e.button.Equals(0)) // Left click - Place
 			{
 				deckCellInfo.ColorType = (ColorType)enum_DeckColor.value;
-				deckCellInfo.Color = colorDataSO.ColorData[(ColorType)enum_DeckColor.value].color;
-				deckCellInfo.Button.style.backgroundColor = colorDataSO.ColorData[(ColorType)enum_DeckColor.value].color;
+				deckCellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_DeckColor.value].Material.color;
+				deckCellInfo.Button.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)enum_DeckColor.value].Material.color;
 			}
 			else if (e.button.Equals(1)) // Right click - Delete
 			{
@@ -531,6 +529,7 @@ namespace LevelEditor
 			level.Grid.Setup(gridCells);
 			level.Deck.Setup(deckCells);
 			level.Setup((LevelType)enum_LevelType.value, (int)uintField_LevelTypeArgument.value);
+			level.GoalManager.Setup(goals);
 		}
 
 		#endregion
@@ -539,6 +538,55 @@ namespace LevelEditor
 
 		private void Load()
 		{
+			if (!levelField.value) return;
+
+			loadedLevel = AssetDatabase.LoadAssetAtPath<Level>(AssetDatabase.GetAssetPath(levelField.value.GetInstanceID()));
+
+			v2Int_Size.value = new Vector2Int(loadedLevel.Grid.GridCells.GetLength(0), loadedLevel.Grid.GridCells.GetLength(1));
+
+			enum_LevelType.value = loadedLevel.LevelType;
+			uintField_LevelTypeArgument.value = (uint)loadedLevel.LevelTypeArgument;
+
+			txt_LevelNo.value = (uint)ParseLevelNo(loadedLevel.name);
+
+			SetupGrid();
+
+			var levelGridCells = loadedLevel.Grid.GridCells;
+			for (int y = 0; y < levelGridCells.GetLength(1); y++)
+			{
+				for (int x = 0; x < levelGridCells.GetLength(0); x++)
+				{
+					var levelCell = levelGridCells[x, y];
+					if (!levelCell.CurrentShapeCell) continue;
+
+					var cell = gridCells[x, y];
+					cell.ColorType = levelCell.CurrentShapeCell.ColorType;
+					cell.Color = colorDataSO.ColorDatas[cell.ColorType].Material.color;
+					cell.Button.style.backgroundColor = cell.Color;
+				}
+			}
+
+			var levelDecks = loadedLevel.Deck.Shapes;
+			for (int i = 0; i < levelDecks.Count; i++)
+			{
+				if (!i.Equals(0))
+					AddDeckTab();
+
+				foreach (var levelShapeCell in levelDecks[i].ShapeCells)
+				{
+					var cell = deckCells[i][levelShapeCell.ShapeCoordinates.x, levelShapeCell.ShapeCoordinates.y];
+					cell.ColorType = levelShapeCell.ColorType;
+					cell.Coordinates = levelShapeCell.ShapeCoordinates;
+					cell.Color = colorDataSO.ColorDatas[levelShapeCell.ColorType].Material.color;
+					cell.Button.style.backgroundColor = cell.Color;
+				}
+			}
+
+			goals = new List<Goal>(loadedLevel.GoalManager.GoalDictionary.Values);
+
+			listView_Goal.itemsSource = goals;
+			listView_Goal.Rebuild();
+			listView_Goal.RefreshItems();
 		}
 
 		private int ParseLevelNo(string levelName)

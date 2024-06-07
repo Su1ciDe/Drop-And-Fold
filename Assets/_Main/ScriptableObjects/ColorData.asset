@@ -12,19 +12,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbafc8e7ee32447f8644c2708833e4d7, type: 3}
   m_Name: ColorData
   m_EditorClassIdentifier: 
-  ColorData:
+  ColorDatas:
     _serializedList:
     - Key: -1
-      Value: {fileID: 2100000, guid: eb21b7398bc5c4c1bbf15d8d4fd16975, type: 2}
+      Value:
+        Material: {fileID: 2100000, guid: eb21b7398bc5c4c1bbf15d8d4fd16975, type: 2}
+        Sprite: {fileID: 0}
     - Key: 0
-      Value: {fileID: 2100000, guid: 229f03df6612d4a2d8f7cf7dcd3c73c1, type: 2}
+      Value:
+        Material: {fileID: 2100000, guid: 229f03df6612d4a2d8f7cf7dcd3c73c1, type: 2}
+        Sprite: {fileID: 0}
     - Key: 1
-      Value: {fileID: 2100000, guid: d9e5c76cdcec142d691f513b8d0e5539, type: 2}
+      Value:
+        Material: {fileID: 2100000, guid: d9e5c76cdcec142d691f513b8d0e5539, type: 2}
+        Sprite: {fileID: 0}
     - Key: 2
-      Value: {fileID: 2100000, guid: 3ecc9a08f05d942858a3a1b5de1b5ce5, type: 2}
+      Value:
+        Material: {fileID: 2100000, guid: 3ecc9a08f05d942858a3a1b5de1b5ce5, type: 2}
+        Sprite: {fileID: 0}
     - Key: 3
-      Value: {fileID: 2100000, guid: 57c742fd8a65c4c2da5ae829941f475a, type: 2}
+      Value:
+        Material: {fileID: 2100000, guid: 57c742fd8a65c4c2da5ae829941f475a, type: 2}
+        Sprite: {fileID: 0}
     - Key: 4
-      Value: {fileID: 2100000, guid: 0a95c62b36e01432fa59ca8adffca6c7, type: 2}
+      Value:
+        Material: {fileID: 2100000, guid: 0a95c62b36e01432fa59ca8adffca6c7, type: 2}
+        Sprite: {fileID: 0}
     - Key: 5
-      Value: {fileID: 2100000, guid: 10555552ee07644269ba111a136a3335, type: 2}
+      Value:
+        Material: {fileID: 2100000, guid: 10555552ee07644269ba111a136a3335, type: 2}
+        Sprite: {fileID: 0}

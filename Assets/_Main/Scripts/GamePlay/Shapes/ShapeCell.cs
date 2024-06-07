@@ -7,7 +7,6 @@ using Fiber.Utilities;
 using GamePlay.GridSystem;
 using GamePlay.DeckSystem;
 using TriInspector;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
 using Utilities;
@@ -15,6 +14,7 @@ using Grid = GamePlay.GridSystem.Grid;
 
 namespace GamePlay.Shapes
 {
+	[SelectionBase]
 	public class ShapeCell : MonoBehaviour
 	{
 		[field: Title("Properties")]
@@ -29,21 +29,40 @@ namespace GamePlay.Shapes
 		[SerializeField] private Collider col;
 
 		private ShapeCell currentShapeCellUnder;
+		private GridCell currentGridCellUnder;
 
 		public static readonly float SIZE = 1;
 		private const float PLACE_SPEED = 15;
 		public static float FOLD_DURATION = .5f;
+		private const string SEPARATOR_TAG = "Separator";
 
-		public static event UnityAction<int> OnFoldComplete; // int foldCount 
+		public static event UnityAction<ColorType, int, Vector3> OnFoldComplete; //ColorType colorType, int foldCount, Vector3 foldPosition
 
 		public void Place()
 		{
-			var gridCell = Grid.Instance.GetCell(currentShapeCellUnder.Coordinates);
+			GridCell gridCell = null;
+
+			if (currentShapeCellUnder)
+			{
+				gridCell = Grid.Instance.GetCell(currentShapeCellUnder.Coordinates);
+			}
+			else if (currentGridCellUnder)
+			{
+				gridCell = currentGridCellUnder;
+			}
+
+			if (!gridCell) return;
 
 			var yAbove = gridCell.Coordinates.y;
 			GridCell cellAbove = null;
 			while (cellAbove is null)
 			{
+				cellAbove = Grid.Instance.TryToGetCell(gridCell.Coordinates.x, yAbove);
+				if (cellAbove?.CurrentShapeCell)
+				{
+					cellAbove = null;
+				}
+
 				yAbove--;
 				if (yAbove < 0)
 				{
@@ -51,13 +70,6 @@ namespace GamePlay.Shapes
 					LevelManager.Instance.Lose();
 
 					return;
-				}
-
-				cellAbove = Grid.Instance.TryToGetCell(gridCell.Coordinates.x, yAbove);
-				if (cellAbove?.CurrentShapeCell)
-				{
-					cellAbove = null;
-					continue;
 				}
 			}
 
@@ -75,12 +87,14 @@ namespace GamePlay.Shapes
 				// Check folding
 				StartCoroutine(CheckFold());
 
+				col.enabled = true;
 				IsBusy = false;
 			});
 		}
 
 		private IEnumerator CheckFold()
 		{
+			var pos = transform.position;
 			var currentCell = Grid.Instance.GetCell(Coordinates);
 
 			var neighbours = Grid.Instance.GetSameNeighbours(currentCell);
@@ -105,9 +119,16 @@ namespace GamePlay.Shapes
 			}
 
 			yield return Fold(neighbours);
-			// TODO: destroy neighbour cells and this cell
 
-			OnFoldComplete?.Invoke(neighbours.Count());
+			OnFoldComplete?.Invoke(ColorType, neighbours.Count() + 1, pos);
+
+			// destroy neighbour cells and this cell
+			foreach (var shapeCell in neighbours)
+			{
+				currentCell.CurrentShapeCell = null;
+				Destroy(shapeCell.gameObject);
+				Destroy(gameObject);
+			}
 		}
 
 		private IEnumerator Fold(IEnumerable<ShapeCell> neighbours)
@@ -117,8 +138,6 @@ namespace GamePlay.Shapes
 				yield return neighbourCell.FoldTo(transform.position).WaitForCompletion();
 			}
 		}
-
-		private const string SEPARATOR_TAG = "Separator";
 
 		private Tween FoldTo(Vector3 position)
 		{
@@ -132,14 +151,30 @@ namespace GamePlay.Shapes
 			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetEase(Ease.Linear).OnComplete(() => { ObjectPooler.Instance.Release(separator, SEPARATOR_TAG); });
 		}
 
-		public ShapeCell GetCellUnder()
+		public ShapeCell GetShapeCellUnder()
 		{
 			if (Physics.Raycast(transform.position, Vector3.down, out var hit, 100, Deck.ShapeCellLayerMask))
 			{
 				if (hit.rigidbody && hit.rigidbody.TryGetComponent(out ShapeCell shapeCell))
 				{
 					currentShapeCellUnder = shapeCell;
+					currentGridCellUnder = null;
 					return shapeCell;
+				}
+			}
+
+			return null;
+		}
+
+		public GridCell GetGridCellUnder()
+		{
+			if (Physics.Raycast(transform.position, Vector3.down, out var hit, 100, Deck.GridCellLayerMask))
+			{
+				if (hit.rigidbody && hit.rigidbody.TryGetComponent(out GridCell gridCell))
+				{
+					currentGridCellUnder = Grid.Instance.GetCell(gridCell.X, Grid.Instance.GridCells.GetLength(1) - 1);
+					currentShapeCellUnder = null;
+					return gridCell;
 				}
 			}
 
@@ -152,14 +187,14 @@ namespace GamePlay.Shapes
 		{
 			Coordinates = coordinates;
 			ColorType = colorType;
-			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorData[ColorType];
+			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
 			col.enabled = true;
 		}
 
 		public void SetupShape(ColorType colorType, Vector2Int coordinates)
 		{
 			ColorType = colorType;
-			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorData[ColorType];
+			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
 			ShapeCoordinates = coordinates;
 			col.enabled = false;
 		}

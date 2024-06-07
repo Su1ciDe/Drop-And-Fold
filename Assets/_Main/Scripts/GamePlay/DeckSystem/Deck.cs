@@ -18,6 +18,7 @@ namespace GamePlay.DeckSystem
 
 		[Title("Properties")]
 		[SerializeField, ReadOnly] private List<Shape> shapes = new List<Shape>();
+		public List<Shape> Shapes => shapes;
 
 		[Title("References")]
 		[SerializeField] private Transform spawnPoint;
@@ -29,10 +30,12 @@ namespace GamePlay.DeckSystem
 		private readonly Queue<Shape> shapeQueue = new Queue<Shape>();
 
 		public static LayerMask ShapeCellLayerMask;
+		public static LayerMask GridCellLayerMask;
 
 		private void Awake()
 		{
 			ShapeCellLayerMask = LayerMask.GetMask("ShapeCell");
+			GridCellLayerMask = LayerMask.GetMask("GridCell");
 		}
 
 		private void OnEnable()
@@ -95,7 +98,6 @@ namespace GamePlay.DeckSystem
 			foreach (var deckCellInfos in deckCellInfosList)
 			{
 				var middle = FindMiddle(deckCellInfos);
-				Debug.Log(middle);
 				var shape = (Shape)PrefabUtility.InstantiatePrefab(shapePrefab, transform);
 
 				for (int y = 0; y < deckCellInfos.GetLength(1); y++)

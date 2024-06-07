@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Fiber.Utilities;
 using Fiber.AudioSystem;
@@ -95,6 +96,12 @@ namespace Fiber.Managers
 			CurrentLevel.Load();
 			OnLevelLoad?.Invoke();
 
+			StartCoroutine(WaitStart());
+		}
+
+		private IEnumerator WaitStart()
+		{
+			yield return null;
 			StartLevel();
 		}
 

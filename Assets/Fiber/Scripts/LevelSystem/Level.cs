@@ -1,4 +1,5 @@
 using GamePlay.DeckSystem;
+using Managers;
 using TriInspector;
 using UnityEngine;
 using Utilities;
@@ -18,6 +19,9 @@ namespace Fiber.LevelSystem
 
 		[SerializeField] private Deck deck;
 		public Deck Deck => deck;
+
+		[SerializeField] private GoalManager goalManager;
+		public GoalManager GoalManager => goalManager;
 
 		public virtual void Load()
 		{
