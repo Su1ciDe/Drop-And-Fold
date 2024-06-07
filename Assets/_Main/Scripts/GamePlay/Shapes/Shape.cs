@@ -22,7 +22,7 @@ namespace GamePlay.Shapes
 
 		private void Start()
 		{
-			offset = Grid.Instance.Offset.x - width * ShapeCell.SIZE / 4;
+			offset = Grid.Instance.Offset.x - width * ShapeCell.SIZE / 4f;
 		}
 
 		public void Move(float xPos)
@@ -34,10 +34,18 @@ namespace GamePlay.Shapes
 
 			for (var i = 0; i < ShapeCells.Count; i++)
 			{
-				var shapeCell = ShapeCells[i].GetCellUnder();
-				var gridCell = Grid.Instance.GetCell(shapeCell.Coordinates);
+				var shapeCell = ShapeCells[i].GetShapeCellUnder();
+				GridCell gridCell;
+				if (shapeCell)
+					gridCell = Grid.Instance.TryToGetCell(shapeCell.Coordinates);
+				else
+				{
+					gridCell = ShapeCells[i].GetGridCellUnder();
+					gridCell = Grid.Instance.GetCell(gridCell.X, Grid.Instance.GridCells.GetLength(1) - 1);
+				}
 
-				touchingGridCells.AddIfNotContains(gridCell);
+				if (gridCell)
+					touchingGridCells.AddIfNotContains(gridCell);
 			}
 
 			SetHighlights(true);
@@ -49,7 +57,7 @@ namespace GamePlay.Shapes
 			{
 				var x = touchingGridCells[i].X;
 				var y = touchingGridCells[i].Y;
-				for (int j = 0; j < y; j++)
+				for (int j = 0; j <= y; j++)
 				{
 					if (show)
 						Grid.Instance.GetCell(x, j).ShowHighlight();
@@ -57,22 +65,6 @@ namespace GamePlay.Shapes
 						Grid.Instance.GetCell(x, j).HideHighlight();
 				}
 			}
-		}
-
-		private GridCell FindHighestCell()
-		{
-			if (touchingGridCells is null || touchingGridCells.Count <= 0) return null;
-			
-			var highestCell = touchingGridCells[0];
-			for (var i = 1; i < touchingGridCells.Count; i++)
-			{
-				if (touchingGridCells[i].Y < highestCell.Y)
-				{
-					highestCell = touchingGridCells[i];
-				}
-			}
-
-			return highestCell;
 		}
 
 		public void Place()
@@ -100,6 +92,22 @@ namespace GamePlay.Shapes
 			touchingGridCells.Clear();
 
 			OnPlace?.Invoke(this);
+		}
+
+		private GridCell FindHighestCell()
+		{
+			if (touchingGridCells is null || touchingGridCells.Count <= 0) return null;
+
+			var highestCell = touchingGridCells[0];
+			for (var i = 1; i < touchingGridCells.Count; i++)
+			{
+				if (touchingGridCells[i].Y < highestCell.Y)
+				{
+					highestCell = touchingGridCells[i];
+				}
+			}
+
+			return highestCell;
 		}
 
 		public void Setup(float _width, float _height)

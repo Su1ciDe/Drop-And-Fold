@@ -42,13 +42,14 @@ namespace GamePlay.GridSystem
 		private void OnDisable()
 		{
 			LevelManager.OnLevelLoad -= OnLevelLoaded;
+			ShapeCell.OnFoldComplete -= OnFoldComplete;
 		}
 
 		private void OnLevelLoaded()
 		{
 		}
 
-		private void OnFoldComplete(int count)
+		private void OnFoldComplete(ColorType colorType, int count)
 		{
 			if (rearrangeCoroutine is not null)
 				StopCoroutine(rearrangeCoroutine);
@@ -65,7 +66,7 @@ namespace GamePlay.GridSystem
 
 			IsRearranging = true;
 			yield return new WaitForSeconds(ShapeCell.FOLD_DURATION + 0.05f);
-			
+
 			for (int y = height - 1; y >= 0; y--)
 			{
 				for (int x = 0; x < width; x++)

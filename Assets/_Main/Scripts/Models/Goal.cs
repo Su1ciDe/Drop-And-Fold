@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Events;
 using Utilities;
 
 namespace Models
@@ -8,6 +9,10 @@ namespace Models
 	{
 		public ColorType ColorType;
 		public int Amount;
+
+		public int CurrentAmount { get; set; } = 0;
+
+		public event UnityAction OnComplete;
 
 		public Goal(ColorType colorType, int amount)
 		{
@@ -19,6 +24,11 @@ namespace Models
 		{
 			ColorType = ColorType.None;
 			Amount = 0;
+		}
+
+		public void Complete()
+		{
+			OnComplete?.Invoke();
 		}
 	}
 }
