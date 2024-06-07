@@ -49,7 +49,7 @@ namespace GamePlay.GridSystem
 		{
 		}
 
-		private void OnFoldComplete(ColorType colorType, int count)
+		private void OnFoldComplete(ColorType colorType, int count, Vector3 pos)
 		{
 			if (rearrangeCoroutine is not null)
 				StopCoroutine(rearrangeCoroutine);

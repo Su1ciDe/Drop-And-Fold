@@ -14,6 +14,7 @@ using Grid = GamePlay.GridSystem.Grid;
 
 namespace GamePlay.Shapes
 {
+	[SelectionBase]
 	public class ShapeCell : MonoBehaviour
 	{
 		[field: Title("Properties")]
@@ -35,7 +36,7 @@ namespace GamePlay.Shapes
 		public static float FOLD_DURATION = .5f;
 		private const string SEPARATOR_TAG = "Separator";
 
-		public static event UnityAction<ColorType, int> OnFoldComplete; // int foldCount 
+		public static event UnityAction<ColorType, int, Vector3> OnFoldComplete; //ColorType colorType, int foldCount, Vector3 foldPosition
 
 		public void Place()
 		{
@@ -86,12 +87,14 @@ namespace GamePlay.Shapes
 				// Check folding
 				StartCoroutine(CheckFold());
 
+				col.enabled = true;
 				IsBusy = false;
 			});
 		}
 
 		private IEnumerator CheckFold()
 		{
+			var pos = transform.position;
 			var currentCell = Grid.Instance.GetCell(Coordinates);
 
 			var neighbours = Grid.Instance.GetSameNeighbours(currentCell);
@@ -117,7 +120,7 @@ namespace GamePlay.Shapes
 
 			yield return Fold(neighbours);
 
-			OnFoldComplete?.Invoke(ColorType, neighbours.Count());
+			OnFoldComplete?.Invoke(ColorType, neighbours.Count() + 1, pos);
 
 			// destroy neighbour cells and this cell
 			foreach (var shapeCell in neighbours)
@@ -184,14 +187,14 @@ namespace GamePlay.Shapes
 		{
 			Coordinates = coordinates;
 			ColorType = colorType;
-			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorData[ColorType];
+			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
 			col.enabled = true;
 		}
 
 		public void SetupShape(ColorType colorType, Vector2Int coordinates)
 		{
 			ColorType = colorType;
-			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorData[ColorType];
+			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
 			ShapeCoordinates = coordinates;
 			col.enabled = false;
 		}

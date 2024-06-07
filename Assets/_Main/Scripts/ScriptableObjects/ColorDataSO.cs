@@ -7,6 +7,13 @@ namespace ScriptableObjects
 	[CreateAssetMenu(fileName = "ColorData", menuName = "Drop N Fold/Color Data", order = 0)]
 	public class ColorDataSO : ScriptableObject
 	{
-		public SerializedDictionary<ColorType, Material> ColorData = new SerializedDictionary<ColorType, Material>();
+		[System.Serializable]
+		public class ColorData
+		{
+			public Material Material;
+			public Sprite Sprite;
+		}
+
+		public SerializedDictionary<ColorType, ColorData> ColorDatas = new SerializedDictionary<ColorType, ColorData>();
 	}
 }

@@ -57,3 +57,7 @@ MonoBehaviour:
     Prefab: {fileID: 6127042944599229058, guid: 493b628ee58d44ee2ac19e79e1a5f7b2, type: 3}
     InitialSize: 8
     MaxSize: 64
+  - Tag: GoalIcon
+    Prefab: {fileID: 3560256668848133274, guid: cdbc534e21c8a4f70981f9a42b494938, type: 3}
+    InitialSize: 25
+    MaxSize: 100

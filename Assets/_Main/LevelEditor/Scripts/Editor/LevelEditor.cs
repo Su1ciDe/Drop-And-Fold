@@ -128,7 +128,7 @@ namespace LevelEditor
 			MainGrid_VE = rootVisualElement.Q<VisualElement>(nameof(MainGrid_VE));
 			Grid_SV = rootVisualElement.Q<ScrollView>(nameof(Grid_SV));
 			enum_GridColor = rootVisualElement.Q<EnumField>(nameof(enum_GridColor));
-			enum_GridColor.RegisterValueChangedCallback(evt => { enum_GridColor.style.backgroundColor = colorDataSO.ColorData[(ColorType)evt.newValue].color; });
+			enum_GridColor.RegisterValueChangedCallback(evt => { enum_GridColor.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)evt.newValue].Material.color; });
 
 			// Deck
 			MainDeck_VE = rootVisualElement.Q<VisualElement>(nameof(MainDeck_VE));
@@ -186,7 +186,7 @@ namespace LevelEditor
 
 					enumColor.RegisterValueChangedCallback(evt =>
 					{
-						amount.style.backgroundColor = enumColor.style.backgroundColor = colorDataSO.ColorData[(ColorType)evt.newValue].color;
+						amount.style.backgroundColor = enumColor.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)evt.newValue].Material.color;
 
 						goals[(int)enumColor.userData].ColorType = (ColorType)evt.newValue;
 					});
@@ -398,8 +398,8 @@ namespace LevelEditor
 			if (e.button.Equals(0)) // Left click - Place
 			{
 				cellInfo.ColorType = (ColorType)enum_GridColor.value;
-				cellInfo.Color = colorDataSO.ColorData[(ColorType)enum_GridColor.value].color;
-				cellInfo.Button.style.backgroundColor = colorDataSO.ColorData[(ColorType)enum_GridColor.value].color;
+				cellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_GridColor.value].Material.color;
+				cellInfo.Button.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)enum_GridColor.value].Material.color;
 			}
 			else if (e.button.Equals(1)) // Right click - Delete
 			{
@@ -467,8 +467,8 @@ namespace LevelEditor
 			if (e.button.Equals(0)) // Left click - Place
 			{
 				deckCellInfo.ColorType = (ColorType)enum_DeckColor.value;
-				deckCellInfo.Color = colorDataSO.ColorData[(ColorType)enum_DeckColor.value].color;
-				deckCellInfo.Button.style.backgroundColor = colorDataSO.ColorData[(ColorType)enum_DeckColor.value].color;
+				deckCellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_DeckColor.value].Material.color;
+				deckCellInfo.Button.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)enum_DeckColor.value].Material.color;
 			}
 			else if (e.button.Equals(1)) // Right click - Delete
 			{
@@ -561,7 +561,7 @@ namespace LevelEditor
 
 					var cell = gridCells[x, y];
 					cell.ColorType = levelCell.CurrentShapeCell.ColorType;
-					cell.Color = colorDataSO.ColorData[cell.ColorType].color;
+					cell.Color = colorDataSO.ColorDatas[cell.ColorType].Material.color;
 					cell.Button.style.backgroundColor = cell.Color;
 				}
 			}
@@ -572,13 +572,12 @@ namespace LevelEditor
 				if (!i.Equals(0))
 					AddDeckTab();
 
-
 				foreach (var levelShapeCell in levelDecks[i].ShapeCells)
 				{
 					var cell = deckCells[i][levelShapeCell.ShapeCoordinates.x, levelShapeCell.ShapeCoordinates.y];
 					cell.ColorType = levelShapeCell.ColorType;
 					cell.Coordinates = levelShapeCell.ShapeCoordinates;
-					cell.Color = colorDataSO.ColorData[levelShapeCell.ColorType].color;
+					cell.Color = colorDataSO.ColorDatas[levelShapeCell.ColorType].Material.color;
 					cell.Button.style.backgroundColor = cell.Color;
 				}
 			}

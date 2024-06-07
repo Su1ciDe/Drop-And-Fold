@@ -24,7 +24,7 @@ namespace Fiber.Managers
 			base.Awake();
 
 			InGameUI = GetComponentInChildren<InGameUI>();
-			InGameUI.Hide();
+			// InGameUI.Hide();
 		}
 
 		private void OnEnable()

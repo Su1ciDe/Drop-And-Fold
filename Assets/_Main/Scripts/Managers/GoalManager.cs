@@ -24,7 +24,7 @@ namespace Managers
 			ShapeCell.OnFoldComplete -= OnFoldCompleted;
 		}
 
-		private void OnFoldCompleted(ColorType colorType, int count)
+		private void OnFoldCompleted(ColorType colorType, int count,Vector3 pos)
 		{
 			if (!goalDictionary.TryGetValue(colorType, out var goal)) return;
 			
