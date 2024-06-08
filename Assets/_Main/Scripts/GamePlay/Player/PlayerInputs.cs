@@ -2,12 +2,15 @@ using Fiber.Managers;
 using Fiber.Utilities;
 using GamePlay.DeckSystem;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GamePlay.Player
 {
 	public class PlayerInputs : MonoBehaviour
 	{
 		public bool CanInput { get; set; } = true;
+
+		public static event UnityAction<Vector3> OnMouseDown;
 
 		private void OnEnable()
 		{
@@ -27,6 +30,7 @@ namespace GamePlay.Player
 			if (!CanInput) return;
 			if (Input.GetMouseButtonDown(0))
 			{
+				OnMouseDown?.Invoke(Input.mousePosition);
 				OnDown();
 			}
 

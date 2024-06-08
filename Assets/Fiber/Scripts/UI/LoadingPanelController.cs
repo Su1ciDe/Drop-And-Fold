@@ -21,6 +21,7 @@ namespace Fiber.UI
 		[SerializeField] private Image imgLoadingScreen;
 		[SerializeField] private Image imgLoadingScreenTitle;
 
+		public event UnityAction OnLoadingStarted;
 		public event UnityAction OnLoadingFinished;
 
 		private void Start()
@@ -30,6 +31,7 @@ namespace Fiber.UI
 
 			float _duration = Random.Range(minLoadingDuration, maxLoadingDuration);
 
+			OnLoadingStarted?.Invoke();
 			imgFillBar.DOFillAmount(1f, _duration).SetEase(loadingEase).SetLink(gameObject).SetTarget(gameObject).OnComplete(() =>
 			{
 				loadingPanelParent.SetActive(false);

@@ -39,7 +39,8 @@ namespace UI
 		{
 			if (goal.ColorType != colorType) return;
 
-			StartCoroutine(WaitGoalUpdate());
+			if (isActiveAndEnabled)
+				StartCoroutine(WaitGoalUpdate());
 			return;
 
 			IEnumerator WaitGoalUpdate()
