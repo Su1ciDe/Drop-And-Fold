@@ -27,7 +27,15 @@ namespace Managers
 
 		private void OnFoldCompleted(ColorType colorType, int count, Vector3 pos)
 		{
-			if (!goalDictionary.TryGetValue(colorType, out var goal)) return;
+			Goal goal = null;
+			if (goalDictionary.ContainsKey(ColorType.None))
+			{
+				goal = goalDictionary[ColorType.None];
+			}
+			else
+			{
+				if (!goalDictionary.TryGetValue(colorType, out goal)) return;
+			}
 
 			goal.CurrentAmount = Mathf.Clamp(goal.CurrentAmount + count, 0, goal.Amount);
 			if (goal.CurrentAmount >= goal.Amount)

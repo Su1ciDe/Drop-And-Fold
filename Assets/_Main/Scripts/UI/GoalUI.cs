@@ -37,7 +37,8 @@ namespace UI
 
 		private void OnFoldCompleted(ColorType colorType, int count, Vector3 pos)
 		{
-			if (goal.ColorType != colorType) return;
+			if (goal.ColorType != ColorType.None)
+				if (goal.ColorType != colorType) return;
 
 			if (isActiveAndEnabled)
 				StartCoroutine(WaitGoalUpdate());
