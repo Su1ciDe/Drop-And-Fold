@@ -25,10 +25,18 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 35b68de5217f9c24bbed79590f5ab725, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 2800000, guid: 08fd72f97367e094d8e90b9e786f1f9b, type: 3}
         m_Scale: {x: 0.25, y: 0.25}
         m_Offset: {x: 0.5, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 35b68de5217f9c24bbed79590f5ab725, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats: []
     m_Colors:
