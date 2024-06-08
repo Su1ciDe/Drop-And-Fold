@@ -85,7 +85,8 @@ namespace GamePlay.Shapes
 			transform.DOMove(cellToPlace.transform.position, PLACE_SPEED).SetSpeedBased().SetEase(Ease.Linear).OnComplete(() =>
 			{
 				// Check folding
-				StartCoroutine(CheckFold());
+				if (isActiveAndEnabled)
+					StartCoroutine(CheckFold());
 
 				col.enabled = true;
 				IsBusy = false;
@@ -101,15 +102,27 @@ namespace GamePlay.Shapes
 			var tempNeighbours = neighbours;
 			yield return new WaitUntil(() => !tempNeighbours.Any(x => x.IsBusy));
 			yield return null;
+			IsBusy = true;
 			yield return new WaitUntil(() => !Grid.Instance.IsRearranging);
+			yield return null;
 
-			if (!currentCell.CurrentShapeCell)
+			if (!currentCell.CurrentShapeCell || currentCell.CurrentShapeCell != this)
+			{
+				currentCell = Grid.Instance.GetCell(Coordinates);
+				if (!currentCell.CurrentShapeCell)
+				{
+					IsBusy = false;
+					yield break;
+				}
+			}
+
+			neighbours = Grid.Instance.GetSameNeighbours(currentCell).ToArray();
+
+			if (!neighbours.Any())
 			{
 				IsBusy = false;
 				yield break;
 			}
-
-			neighbours = Grid.Instance.GetSameNeighbours(currentCell).ToArray();
 
 			foreach (var neighbourCell in neighbours)
 			{
@@ -148,7 +161,11 @@ namespace GamePlay.Shapes
 			var dir = (position - transform.position).normalized;
 			var dirCrossed = Vector3.Cross(dir, Vector3.forward);
 
-			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetEase(Ease.Linear).OnComplete(() => { ObjectPooler.Instance.Release(separator, SEPARATOR_TAG); });
+			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetEase(Ease.Linear).OnComplete(() =>
+			{
+				ObjectPooler.Instance.Release(separator, SEPARATOR_TAG);
+				IsBusy = false;
+			});
 		}
 
 		public ShapeCell GetShapeCellUnder()

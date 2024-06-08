@@ -69,6 +69,8 @@ namespace GamePlay.Shapes
 
 		public void Place()
 		{
+			if (touchingGridCells is null || touchingGridCells.Count <= 0) return;
+
 			SetHighlights(false);
 			var highestCell = FindHighestCell();
 			if (highestCell?.Y >= height)

@@ -14,7 +14,7 @@ namespace Fiber.Utilities
 			[Tooltip("Give a tag to the pool to call")]
 			public string Tag;
 			[Tooltip("The prefab to be pooled")]
-			public GameObject Prefab;
+			[AssetsOnly] public GameObject Prefab;
 			[Tooltip("The size (count) of the pool")]
 			public int InitialSize = 10;
 			[Tooltip("The max size (count) pool can reach")]

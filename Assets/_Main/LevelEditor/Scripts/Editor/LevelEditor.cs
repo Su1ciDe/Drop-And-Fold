@@ -521,7 +521,11 @@ namespace LevelEditor
 
 			// Change with the deleted level in the LevelManager
 			if (!index.Equals(-1))
-				LevelManager.Instance.Levels[index] = savedLevel;
+			{
+				var prefab = PrefabUtility.GetNearestPrefabInstanceRoot(savedLevel).GetComponent<Level>();
+				LevelManager.Instance.Levels[index] = prefab;
+				EditorSceneManager.SaveOpenScenes();
+			}
 		}
 
 		private void SetupLevel(Level level)

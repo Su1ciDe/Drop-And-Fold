@@ -59,7 +59,7 @@ namespace UI
 					var icon = ObjectPooler.Instance.Spawn(ICON_TAG, pos).GetComponent<GoalIconUI>();
 					icon.Setup(colorType);
 					icon.transform.SetParent(UIManager.Instance.transform);
-					icon.transform.DOLocalMove(Vector3.zero, ICON_MOVE_DURATION).SetDelay(i * DELAY).SetEase(Ease.InBack).OnComplete(() =>
+					icon.transform.DOMove(transform.position, ICON_MOVE_DURATION).SetDelay(i * DELAY).SetEase(Ease.InBack).OnComplete(() =>
 					{
 						tempCurrency = currentAmount - count;
 						txtGoal.transform.DOComplete();
@@ -77,8 +77,6 @@ namespace UI
 						}
 					});
 				}
-
-				// ChangeGoalText(amount);
 			}
 		}
 

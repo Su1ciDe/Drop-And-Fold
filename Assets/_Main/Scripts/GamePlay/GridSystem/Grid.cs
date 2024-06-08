@@ -253,5 +253,19 @@ namespace GamePlay.GridSystem
 		{
 			return GetCellPosition(coordinates.x, coordinates.y);
 		}
+
+		public bool IsAnyCellBusy()
+		{
+			for (int y = gridCells.GetLength(1) - 1; y >= 0; y--)
+			{
+				for (int x = 0; x < gridCells.GetLength(0); x++)
+				{
+					if (gridCells[x, y].CurrentShapeCell && gridCells[x, y].CurrentShapeCell.IsBusy)
+						return true;
+				}
+			}
+
+			return false;
+		}
 	}
 }
