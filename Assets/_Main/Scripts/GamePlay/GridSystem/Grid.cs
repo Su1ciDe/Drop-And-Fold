@@ -19,7 +19,7 @@ namespace GamePlay.GridSystem
 		[SerializeField, ReadOnly] private Vector2 offset;
 		public Vector2 Offset => offset;
 
-		public bool IsRearranging { get; set; }
+		public bool IsRearranging { get; private set; }
 
 		[Title("Grid Settings")]
 		[SerializeField] private Vector2 cellSize = new Vector2Int(1, 1);
@@ -27,11 +27,11 @@ namespace GamePlay.GridSystem
 		[SerializeField] private float ySpacing = 0;
 		[SerializeField] private GridCell cellPrefab;
 		[SerializeField] private ShapeCell shapeCellPrefab;
-
-		private void Start()
-		{
-			// StartCoroutine(Rearrange());
-		}
+		[Title("GirdFrames")]
+		[SerializeField] private GameObject gridFrameCorner_Left;
+		[SerializeField] private GameObject gridFrameCorner_Right;
+		[SerializeField] private GameObject gridFrameHorizontal;
+		[SerializeField] private GameObject gridFrameVertical;
 
 		private void OnEnable()
 		{
@@ -172,6 +172,24 @@ namespace GamePlay.GridSystem
 					}
 				}
 			}
+
+			var leftCornerPos = new Vector3(-(xOffset + cellSize.x / 2f), -(yOffset + cellSize.y / 2f));
+			var rightCornerPos = new Vector3((xOffset + cellSize.x / 2f), -(yOffset + cellSize.y / 2f));
+
+			var leftCornerPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameCorner_Left, transform);
+			leftCornerPrefab.transform.localPosition = leftCornerPos;
+			var rightCornerPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameCorner_Right, transform);
+			rightCornerPrefab.transform.localPosition = rightCornerPos;
+
+			var horizontalPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameHorizontal, transform);
+			horizontalPrefab.transform.localPosition = new Vector3(leftCornerPos.x + cellSize.x, leftCornerPos.y);
+			horizontalPrefab.transform.localScale = new Vector3(width - 2, 1, 1);
+			var verticalLeftPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameVertical, transform);
+			verticalLeftPrefab.transform.localPosition = new Vector3(leftCornerPos.x, leftCornerPos.y + cellSize.y);
+			verticalLeftPrefab.transform.localScale = new Vector3(1, height - 1, 1);
+			var verticalRightPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameVertical, transform);
+			verticalRightPrefab.transform.localPosition = new Vector3(rightCornerPos.x + cellSize.x / 2f, rightCornerPos.y + cellSize.y);
+			verticalRightPrefab.transform.localScale = new Vector3(1, height - 1, 1);
 		}
 #endif
 
