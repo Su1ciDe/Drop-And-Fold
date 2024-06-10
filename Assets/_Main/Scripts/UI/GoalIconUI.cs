@@ -11,7 +11,9 @@ namespace UI
 
 		public void Setup(ColorType colorType)
 		{
-			goalImage.sprite = GameManager.Instance.ColorDataSO.ColorDatas[colorType].Sprite;
+			var colorData = GameManager.Instance.ColorDataSO.ColorDatas[colorType];
+			goalImage.sprite = colorData.Sprite;
+			goalImage.color = colorData.Material.color;
 		}
 	}
 }

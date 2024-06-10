@@ -65,7 +65,7 @@ namespace GamePlay.GridSystem
 			var height = gridCells.GetLength(1);
 
 			IsRearranging = true;
-			yield return new WaitForSeconds(ShapeCell.FOLD_DURATION + 0.05f);
+			yield return new WaitForSeconds(ShapeCell.FOLD_DURATION + 0.01f);
 
 			for (int y = height - 1; y >= 0; y--)
 			{

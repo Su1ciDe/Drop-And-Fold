@@ -69,7 +69,7 @@ namespace UI
 						ChangeGoalText(Mathf.CeilToInt(Mathf.Lerp(tempCurrentCurrency, tempCurrency, (float)i1 / (count - 1))));
 
 						ObjectPooler.Instance.Release(icon.gameObject, ICON_TAG);
-						HapticManager.Instance.PlayHaptic(.6f, 0);
+						HapticManager.Instance.PlayHaptic(.5f, 0);
 
 						if (amount <= 0)
 						{

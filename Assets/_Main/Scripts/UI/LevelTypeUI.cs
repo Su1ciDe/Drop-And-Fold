@@ -50,11 +50,13 @@ namespace UI
 
 		private void SetupTimer()
 		{
+			imgLevelType.sprite = timerSprite;
 			LevelManager.Instance.CurrentLevel.OnTimerTick += OnTimerTicked;
 		}
 
 		private void SetupMoveCount()
 		{
+			imgLevelType.sprite = moveCountSprite;
 			LevelManager.Instance.CurrentLevel.OnMoveCountChange += OnMoveCountUpdated;
 		}
 

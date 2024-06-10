@@ -18,7 +18,7 @@ namespace GamePlay.Shapes
 
 		private float offset;
 
-		private List<GridCell> touchingGridCells = new List<GridCell>();
+		private readonly List<GridCell> touchingGridCells = new List<GridCell>();
 
 		public static event UnityAction<Shape> OnPlace;
 
@@ -76,23 +76,21 @@ namespace GamePlay.Shapes
 			HapticManager.Instance.PlayHaptic(HapticPatterns.PresetType.RigidImpact);
 
 			SetHighlights(false);
-			var highestCell = FindHighestCell();
-			if (highestCell?.Y >= height)
+			// var highestCell = FindHighestCell();
+			
+			// snap to grid
+			var firstCell = ShapeCells[0];
+			var firstGridCell = touchingGridCells[0];
+
+			var posX = (firstGridCell.transform.position - firstCell.transform.localPosition).x;
+
+			transform.position = new Vector3(posX, Grid.Instance.Offset.y + (height * ShapeCell.SIZE) / 2f + ShapeCell.SIZE / 2f, transform.position.z);
+
+			// Place cells
+			// Note: This is Bottom to Top
+			for (var i = 0; i < ShapeCells.Count; i++)
 			{
-				// snap to grid
-				var firstCell = ShapeCells[0];
-				var firstGridCell = touchingGridCells[0];
-
-				var posX = (firstGridCell.transform.position - firstCell.transform.localPosition).x;
-
-				transform.position = new Vector3(posX, Grid.Instance.Offset.y + (height * ShapeCell.SIZE) / 2f + ShapeCell.SIZE / 2f, transform.position.z);
-
-				// Place cells
-				// Note: This is Bottom to Top 
-				for (var i = 0; i < ShapeCells.Count; i++)
-				{
-					ShapeCells[i].Place();
-				}
+				ShapeCells[i].Place();
 			}
 
 			touchingGridCells.Clear();
