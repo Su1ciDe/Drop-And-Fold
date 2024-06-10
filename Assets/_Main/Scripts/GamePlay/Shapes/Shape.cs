@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Fiber.Managers;
 using Fiber.Utilities.Extensions;
 using GamePlay.GridSystem;
+using Lofelt.NiceVibrations;
 using TriInspector;
 using UnityEngine;
 using UnityEngine.Events;
@@ -70,6 +72,8 @@ namespace GamePlay.Shapes
 		public void Place()
 		{
 			if (touchingGridCells is null || touchingGridCells.Count <= 0) return;
+
+			HapticManager.Instance.PlayHaptic(HapticPatterns.PresetType.RigidImpact);
 
 			SetHighlights(false);
 			var highestCell = FindHighestCell();

@@ -17,13 +17,13 @@ namespace UI
 
 		private const float TIMER_ANIM_DURATION = .25f;
 
-		private void OnEnable()
+		private void Awake()
 		{
 			LevelManager.OnLevelLoad += OnLevelLoaded;
 			LevelManager.OnLevelUnload += OnLevelUnloaded;
 		}
 
-		private void OnDisable()
+		private void OnDestroy()
 		{
 			LevelManager.OnLevelLoad -= OnLevelLoaded;
 			LevelManager.OnLevelUnload -= OnLevelUnloaded;
@@ -74,8 +74,6 @@ namespace UI
 				txtTimer_MoveCount.transform.DOScale(1.5f, TIMER_ANIM_DURATION).SetEase(Ease.InOutCubic).SetLoops(2, LoopType.Yoyo);
 				txtTimer_MoveCount.DOColor(Color.red, TIMER_ANIM_DURATION).SetEase(Ease.InOutCubic).SetLoops(2, LoopType.Yoyo);
 
-				if (HapticManager.Instance.IsPlaying)
-					HapticManager.Instance.StopHaptics();
 				HapticManager.Instance.PlayHaptic(HapticManager.AdvancedHapticType.Heartbeats);
 			}
 		}

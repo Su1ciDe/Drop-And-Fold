@@ -1,8 +1,8 @@
 using DG.Tweening;
 using Fiber.Utilities;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 namespace Fiber.UI
 {
@@ -41,9 +41,12 @@ namespace Fiber.UI
 
 		public void SetLoadingScreen(Sprite background, Sprite loadingScreen, Sprite loadingScreenTitle)
 		{
-			imgBackground.sprite = background;
-			imgLoadingScreen.sprite = loadingScreen;
-			imgLoadingScreenTitle.sprite = loadingScreenTitle;
+			if (background)
+				imgBackground.sprite = background;
+			if (loadingScreen)
+				imgLoadingScreen.sprite = loadingScreen;
+			if (loadingScreenTitle)
+				imgLoadingScreenTitle.sprite = loadingScreenTitle;
 		}
 	}
 }
