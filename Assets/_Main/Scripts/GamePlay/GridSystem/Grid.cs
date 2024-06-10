@@ -92,7 +92,10 @@ namespace GamePlay.GridSystem
 					}
 
 					if (cellUnder && !cellUnder.Coordinates.Equals(shapeCell.Coordinates))
+					{
+						GetCell(shapeCell.Coordinates).CurrentShapeCell = null;
 						shapeCell.Drop(cellUnder);
+					}
 				}
 			}
 
@@ -139,6 +142,53 @@ namespace GamePlay.GridSystem
 		}
 
 		#endregion
+
+		public GridCell GetCell(int x, int y)
+		{
+			return gridCells[x, y];
+		}
+
+		public GridCell GetCell(Vector2Int coordinates)
+		{
+			return GetCell(coordinates.x, coordinates.y);
+		}
+
+		public GridCell TryToGetCell(int x, int y)
+		{
+			if (x >= 0 && x < GridCells.GetLength(0) && y >= 0 && y < GridCells.GetLength(1))
+				return gridCells[x, y];
+
+			return null;
+		}
+
+		public GridCell TryToGetCell(Vector2Int coordinates)
+		{
+			return TryToGetCell(coordinates.x, coordinates.y);
+		}
+
+		public Vector3 GetCellPosition(int x, int y)
+		{
+			return gridCells[x, y].transform.position;
+		}
+
+		public Vector3 GetCellPosition(Vector2Int coordinates)
+		{
+			return GetCellPosition(coordinates.x, coordinates.y);
+		}
+
+		public bool IsAnyCellBusy()
+		{
+			for (int y = gridCells.GetLength(1) - 1; y >= 0; y--)
+			{
+				for (int x = 0; x < gridCells.GetLength(0); x++)
+				{
+					if (gridCells[x, y].CurrentShapeCell && gridCells[x, y].CurrentShapeCell.IsBusy)
+						return true;
+				}
+			}
+
+			return false;
+		}
 
 		#region Setup
 
@@ -238,52 +288,5 @@ namespace GamePlay.GridSystem
 		}
 
 		#endregion
-
-		public GridCell GetCell(int x, int y)
-		{
-			return gridCells[x, y];
-		}
-
-		public GridCell GetCell(Vector2Int coordinates)
-		{
-			return GetCell(coordinates.x, coordinates.y);
-		}
-
-		public GridCell TryToGetCell(int x, int y)
-		{
-			if (x >= 0 && x < GridCells.GetLength(0) && y >= 0 && y < GridCells.GetLength(1))
-				return gridCells[x, y];
-
-			return null;
-		}
-
-		public GridCell TryToGetCell(Vector2Int coordinates)
-		{
-			return TryToGetCell(coordinates.x, coordinates.y);
-		}
-
-		public Vector3 GetCellPosition(int x, int y)
-		{
-			return gridCells[x, y].transform.position;
-		}
-
-		public Vector3 GetCellPosition(Vector2Int coordinates)
-		{
-			return GetCellPosition(coordinates.x, coordinates.y);
-		}
-
-		public bool IsAnyCellBusy()
-		{
-			for (int y = gridCells.GetLength(1) - 1; y >= 0; y--)
-			{
-				for (int x = 0; x < gridCells.GetLength(0); x++)
-				{
-					if (gridCells[x, y].CurrentShapeCell && gridCells[x, y].CurrentShapeCell.IsBusy)
-						return true;
-				}
-			}
-
-			return false;
-		}
 	}
 }

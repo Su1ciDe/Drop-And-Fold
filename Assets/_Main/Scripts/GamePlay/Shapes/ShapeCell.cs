@@ -27,6 +27,8 @@ namespace GamePlay.Shapes
 		[Title("References")]
 		[SerializeField] private MeshRenderer meshRenderer;
 		[SerializeField] private Collider col;
+		[Space]
+		[SerializeField] private AnimationCurve dropCurve;
 
 		private ShapeCell currentShapeCellUnder;
 		private GridCell currentGridCellUnder;
@@ -82,8 +84,9 @@ namespace GamePlay.Shapes
 			Coordinates = cellToPlace.Coordinates;
 			cellToPlace.CurrentShapeCell = this;
 			IsBusy = true;
-			transform.DOMove(cellToPlace.transform.position, PLACE_SPEED).SetSpeedBased().SetEase(Ease.Linear).OnComplete(() =>
+			transform.DOMove(cellToPlace.transform.position, PLACE_SPEED).SetSpeedBased().SetEase(Ease.InQuint).OnComplete(() =>
 			{
+				transform.DOPunchScale(0.25f * Vector3.one, .2f, 1);
 				// Check folding
 				if (isActiveAndEnabled)
 					StartCoroutine(CheckFold());
@@ -101,8 +104,8 @@ namespace GamePlay.Shapes
 			var neighbours = Grid.Instance.GetSameNeighbours(currentCell);
 			var tempNeighbours = neighbours;
 			yield return new WaitUntil(() => !tempNeighbours.Any(x => x.IsBusy));
-			yield return null;
 			IsBusy = true;
+			yield return null;
 			yield return new WaitUntil(() => !Grid.Instance.IsRearranging);
 			yield return null;
 

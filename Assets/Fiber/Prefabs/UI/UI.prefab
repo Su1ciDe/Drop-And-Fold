@@ -7196,11 +7196,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5488087254258765424, guid: 83de285735e2c473a9605d048b34ff87, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 469.6733
+      value: 475
       objectReference: {fileID: 0}
     - target: {fileID: 5488087254258765424, guid: 83de285735e2c473a9605d048b34ff87, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 150.5809
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 5488087254258765424, guid: 83de285735e2c473a9605d048b34ff87, type: 3}
       propertyPath: m_LocalPosition.x

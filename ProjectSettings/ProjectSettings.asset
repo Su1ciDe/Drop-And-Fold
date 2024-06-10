@@ -163,7 +163,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.fibergames.game
+    Android: com.FiberGames.DropAndFold
     Standalone: com.DefaultCompany.Red-Raiding-Hood
     iPhone: com.FiberGames.DropAndFold
   buildNumber:

@@ -216,6 +216,39 @@ MonoBehaviour:
   <ShapeCoordinates>k__BackingField: {x: 0, y: 0}
   meshRenderer: {fileID: 2059282798208788560}
   col: {fileID: 6845929376342375551}
+  dropCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.0234869
+      outSlope: 0.0234869
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.6923077
+    - serializedVersion: 3
+      time: 0.86537564
+      value: 0.25450903
+      inSlope: 1.0483384
+      outSlope: 1.0483384
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.3511327
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 12.022566
+      outSlope: 12.022566
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.48422933
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &816734187434030292
 PrefabInstance:
   m_ObjectHideFlags: 0
