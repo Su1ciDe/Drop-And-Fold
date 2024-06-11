@@ -182,7 +182,7 @@ namespace GamePlay.Shapes
 			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetDelay(0.1f).SetEase(Ease.Linear).OnComplete(() =>
 			{
 				AudioManager.Instance.PlayAudio(AudioName.Fold).SetPitch(1 + index * 0.2f);
-				HapticManager.Instance.PlayHaptic(0.7f, 0);
+				HapticManager.Instance.PlayHaptic(0.3f, .4f, FOLD_DURATION);
 
 				ObjectPooler.Instance.Release(separator, SEPARATOR_TAG);
 				IsBusy = false;

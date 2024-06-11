@@ -13,7 +13,7 @@ namespace UI
 		{
 			var colorData = GameManager.Instance.ColorDataSO.ColorDatas[colorType];
 			goalImage.sprite = colorData.Sprite;
-			goalImage.color = colorData.Material.color;
+			// goalImage.color = colorData.Material.color;
 		}
 	}
 }
