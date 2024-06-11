@@ -72,7 +72,7 @@ namespace Fiber.Managers
 			HapticPatterns.PlayConstant(amplitude, frequency, duration);
 
 			ShowDebugLog(
-				$"<color=aqua>Haptic Constant triggered: <color=orange>Amplitude:<color=lime>{amplitude}</color>, Frequency:<color=lime>{frequency}</color>, for <color=lime>{duration}</color> seconds</color></color></color>");
+				$"<color=aqua>Haptic Constant triggered: <color=orange>Amplitude:<color=lime>{amplitude}</color>, Frequency:<color=lime>{frequency}</color>, for <color=lime>{duration}</color> seconds</color></color>");
 		}
 
 		/// <summary>
@@ -117,7 +117,8 @@ namespace Fiber.Managers
 
 		private IEnumerator HapticMultiple(float amplitude, float frequency, int amount, int delayInBetween)
 		{
-			ShowDebugLog($"<color=aqua>Haptic Multiple Emphasis started: <color=orange>Amplitude:<color=lime>{amplitude}</color>, <color=orange>Frequency:</color><color=lime>{frequency}</color>, delay in between <color=lime>{delayInBetween}</color>, for <color=lime>{amount}</color> times.</color></color>");
+			ShowDebugLog(
+				$"<color=aqua>Haptic Multiple Emphasis started: <color=orange>Amplitude:<color=lime>{amplitude}</color>, <color=orange>Frequency:</color><color=lime>{frequency}</color>, delay in between <color=lime>{delayInBetween}</color>, for <color=lime>{amount}</color> times.</color></color>");
 
 			var delay = new WaitForSecondsRealtime(delayInBetween);
 

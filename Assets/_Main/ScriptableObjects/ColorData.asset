@@ -17,15 +17,15 @@ MonoBehaviour:
     - Key: -1
       Value:
         Material: {fileID: 2100000, guid: eb21b7398bc5c4c1bbf15d8d4fd16975, type: 2}
-        Sprite: {fileID: 0}
+        Sprite: {fileID: 21300000, guid: 292eb4c0f8db5684082595b3c235fa5b, type: 3}
     - Key: 0
       Value:
         Material: {fileID: 2100000, guid: 229f03df6612d4a2d8f7cf7dcd3c73c1, type: 2}
-        Sprite: {fileID: 0}
+        Sprite: {fileID: 21300000, guid: 55f324ab5f051cf40866d80239aa41a4, type: 3}
     - Key: 1
       Value:
         Material: {fileID: 2100000, guid: d9e5c76cdcec142d691f513b8d0e5539, type: 2}
-        Sprite: {fileID: 0}
+        Sprite: {fileID: 21300000, guid: 6979294b4964e5844bd7c00fdf50239e, type: 3}
     - Key: 2
       Value:
         Material: {fileID: 2100000, guid: 3ecc9a08f05d942858a3a1b5de1b5ce5, type: 2}
@@ -33,12 +33,12 @@ MonoBehaviour:
     - Key: 3
       Value:
         Material: {fileID: 2100000, guid: 57c742fd8a65c4c2da5ae829941f475a, type: 2}
-        Sprite: {fileID: 0}
+        Sprite: {fileID: 21300000, guid: 2389cfdaa9616894cb3061fc53ffb201, type: 3}
     - Key: 4
       Value:
         Material: {fileID: 2100000, guid: 0a95c62b36e01432fa59ca8adffca6c7, type: 2}
-        Sprite: {fileID: 0}
+        Sprite: {fileID: 21300000, guid: d2eddec809fb2d4418f9c79e7ed25a8e, type: 3}
     - Key: 5
       Value:
         Material: {fileID: 2100000, guid: 10555552ee07644269ba111a136a3335, type: 2}
-        Sprite: {fileID: 0}
+        Sprite: {fileID: 21300000, guid: ce52a99b6f874904b8be0630ecba586e, type: 3}
