@@ -19,7 +19,7 @@ namespace GamePlay.GridSystem
 		[SerializeField, ReadOnly] private Vector2 offset;
 		public Vector2 Offset => offset;
 
-		public bool IsRearranging { get; set; }
+		public bool IsRearranging { get; private set; }
 
 		[Title("Grid Settings")]
 		[SerializeField] private Vector2 cellSize = new Vector2Int(1, 1);
@@ -27,11 +27,11 @@ namespace GamePlay.GridSystem
 		[SerializeField] private float ySpacing = 0;
 		[SerializeField] private GridCell cellPrefab;
 		[SerializeField] private ShapeCell shapeCellPrefab;
-
-		private void Start()
-		{
-			// StartCoroutine(Rearrange());
-		}
+		[Title("GirdFrames")]
+		[SerializeField] private GameObject gridFrameCorner_Left;
+		[SerializeField] private GameObject gridFrameCorner_Right;
+		[SerializeField] private GameObject gridFrameHorizontal;
+		[SerializeField] private GameObject gridFrameVertical;
 
 		private void OnEnable()
 		{
@@ -65,7 +65,7 @@ namespace GamePlay.GridSystem
 			var height = gridCells.GetLength(1);
 
 			IsRearranging = true;
-			yield return new WaitForSeconds(ShapeCell.FOLD_DURATION + 0.05f);
+			yield return new WaitForSeconds(ShapeCell.FOLD_DURATION + 0.01f);
 
 			for (int y = height - 1; y >= 0; y--)
 			{
@@ -92,7 +92,10 @@ namespace GamePlay.GridSystem
 					}
 
 					if (cellUnder && !cellUnder.Coordinates.Equals(shapeCell.Coordinates))
+					{
+						GetCell(shapeCell.Coordinates).CurrentShapeCell = null;
 						shapeCell.Drop(cellUnder);
+					}
 				}
 			}
 
@@ -140,6 +143,53 @@ namespace GamePlay.GridSystem
 
 		#endregion
 
+		public GridCell GetCell(int x, int y)
+		{
+			return gridCells[x, y];
+		}
+
+		public GridCell GetCell(Vector2Int coordinates)
+		{
+			return GetCell(coordinates.x, coordinates.y);
+		}
+
+		public GridCell TryToGetCell(int x, int y)
+		{
+			if (x >= 0 && x < GridCells.GetLength(0) && y >= 0 && y < GridCells.GetLength(1))
+				return gridCells[x, y];
+
+			return null;
+		}
+
+		public GridCell TryToGetCell(Vector2Int coordinates)
+		{
+			return TryToGetCell(coordinates.x, coordinates.y);
+		}
+
+		public Vector3 GetCellPosition(int x, int y)
+		{
+			return gridCells[x, y].transform.position;
+		}
+
+		public Vector3 GetCellPosition(Vector2Int coordinates)
+		{
+			return GetCellPosition(coordinates.x, coordinates.y);
+		}
+
+		public bool IsAnyCellBusy()
+		{
+			for (int y = gridCells.GetLength(1) - 1; y >= 0; y--)
+			{
+				for (int x = 0; x < gridCells.GetLength(0); x++)
+				{
+					if (gridCells[x, y].CurrentShapeCell && gridCells[x, y].CurrentShapeCell.IsBusy)
+						return true;
+				}
+			}
+
+			return false;
+		}
+
 		#region Setup
 
 #if UNITY_EDITOR
@@ -172,6 +222,24 @@ namespace GamePlay.GridSystem
 					}
 				}
 			}
+
+			var leftCornerPos = new Vector3(-(xOffset + cellSize.x / 2f), -(yOffset + cellSize.y / 2f));
+			var rightCornerPos = new Vector3((xOffset + cellSize.x / 2f), -(yOffset + cellSize.y / 2f));
+
+			var leftCornerPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameCorner_Left, transform);
+			leftCornerPrefab.transform.localPosition = leftCornerPos;
+			var rightCornerPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameCorner_Right, transform);
+			rightCornerPrefab.transform.localPosition = rightCornerPos;
+
+			var horizontalPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameHorizontal, transform);
+			horizontalPrefab.transform.localPosition = new Vector3(leftCornerPos.x + cellSize.x, leftCornerPos.y);
+			horizontalPrefab.transform.localScale = new Vector3(width - 2, 1, 1);
+			var verticalLeftPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameVertical, transform);
+			verticalLeftPrefab.transform.localPosition = new Vector3(leftCornerPos.x, leftCornerPos.y + cellSize.y);
+			verticalLeftPrefab.transform.localScale = new Vector3(1, height - 1, 1);
+			var verticalRightPrefab = (GameObject)PrefabUtility.InstantiatePrefab(gridFrameVertical, transform);
+			verticalRightPrefab.transform.localPosition = new Vector3(rightCornerPos.x + cellSize.x / 2f, rightCornerPos.y + cellSize.y);
+			verticalRightPrefab.transform.localScale = new Vector3(1, height - 1, 1);
 		}
 #endif
 
@@ -220,38 +288,5 @@ namespace GamePlay.GridSystem
 		}
 
 		#endregion
-
-		public GridCell GetCell(int x, int y)
-		{
-			return gridCells[x, y];
-		}
-
-		public GridCell GetCell(Vector2Int coordinates)
-		{
-			return GetCell(coordinates.x, coordinates.y);
-		}
-
-		public GridCell TryToGetCell(int x, int y)
-		{
-			if (x >= 0 && x < GridCells.GetLength(0) && y >= 0 && y < GridCells.GetLength(1))
-				return gridCells[x, y];
-
-			return null;
-		}
-
-		public GridCell TryToGetCell(Vector2Int coordinates)
-		{
-			return TryToGetCell(coordinates.x, coordinates.y);
-		}
-
-		public Vector3 GetCellPosition(int x, int y)
-		{
-			return gridCells[x, y].transform.position;
-		}
-
-		public Vector3 GetCellPosition(Vector2Int coordinates)
-		{
-			return GetCellPosition(coordinates.x, coordinates.y);
-		}
 	}
 }

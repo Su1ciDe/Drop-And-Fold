@@ -2,6 +2,7 @@ using System.Collections;
 using Fiber.Utilities;
 using AYellowpaper.SerializedCollections;
 using Lofelt.NiceVibrations;
+using TriInspector;
 using UnityEngine;
 
 namespace Fiber.Managers
@@ -21,8 +22,11 @@ namespace Fiber.Managers
 
 		public bool IsPlaying => HapticController.IsPlaying() || hapticMultiple is not null;
 
-		[Header("Advanced Haptics")]
+		[Title("Advanced Haptics")]
 		[SerializeField] private SerializedDictionary<AdvancedHapticType, HapticClip> clips;
+
+		[Title("Debug")]
+		[SerializeField] private bool showDebug;
 
 		private Coroutine hapticMultiple;
 
@@ -33,12 +37,13 @@ namespace Fiber.Managers
 		}
 
 		/// <summary>
-		/// Plays a haptic preset
-		/// </summary>
+		/// Plays a set of predefined haptic patterns.</summary>
 		/// <param name="hapticType">Preset type</param>
 		public void PlayHaptic(HapticPatterns.PresetType hapticType)
 		{
 			HapticPatterns.PlayPreset(hapticType);
+
+			ShowDebugLog($"<color=aqua>Haptic Preset triggered: <color=lime>{hapticType}</color></color>");
 		}
 
 		/// <summary>
@@ -49,6 +54,9 @@ namespace Fiber.Managers
 		public void PlayHaptic(float amplitude, float frequency)
 		{
 			HapticPatterns.PlayEmphasis(amplitude, frequency);
+
+			ShowDebugLog(
+				$"<color=aqua>Haptic Emphasis triggered: <color=orange>Amplitude:</color><color=lime>{amplitude}</color>, <color=orange>Frequency:</color><color=lime>{frequency}</color></color>");
 		}
 
 		/// <summary>
@@ -62,6 +70,9 @@ namespace Fiber.Managers
 			StopHaptics();
 
 			HapticPatterns.PlayConstant(amplitude, frequency, duration);
+
+			ShowDebugLog(
+				$"<color=aqua>Haptic Constant triggered: <color=orange>Amplitude:<color=lime>{amplitude}</color>, Frequency:<color=lime>{frequency}</color>, for <color=lime>{duration}</color> seconds</color></color></color>");
 		}
 
 		/// <summary>
@@ -73,6 +84,8 @@ namespace Fiber.Managers
 			StopHaptics();
 
 			HapticController.Play(clips[advancedHapticType]);
+
+			ShowDebugLog($"<color=aqua>Haptic Advanced Preset triggered: <color=lime>{advancedHapticType}</color></color>");
 		}
 
 		/// <summary>
@@ -84,6 +97,8 @@ namespace Fiber.Managers
 			StopHaptics();
 
 			HapticController.Play(hapticClip);
+
+			ShowDebugLog($"<color=aqua>Haptic Clip triggered: <color=lime>{hapticClip.name}</color></color>");
 		}
 
 		/// <summary>
@@ -102,15 +117,50 @@ namespace Fiber.Managers
 
 		private IEnumerator HapticMultiple(float amplitude, float frequency, int amount, int delayInBetween)
 		{
+			ShowDebugLog($"<color=aqua>Haptic Multiple Emphasis started: <color=orange>Amplitude:<color=lime>{amplitude}</color>, <color=orange>Frequency:</color><color=lime>{frequency}</color>, delay in between <color=lime>{delayInBetween}</color>, for <color=lime>{amount}</color> times.</color></color>");
+
 			var delay = new WaitForSecondsRealtime(delayInBetween);
 
 			for (int i = 0; i < amount; i++)
 			{
-				HapticPatterns.PlayEmphasis(amplitude, frequency);
+				PlayHaptic(amplitude, frequency);
 				yield return delay;
 			}
 
 			hapticMultiple = null;
+
+			ShowDebugLog("<color=aqua>Haptic Multiple Emphasis <color=red>finished</color>!</color>");
+		}
+
+		/// <summary>
+		/// Plays a multiple emphasis haptics at given amount of times and delay
+		/// </summary>
+		/// <param name="hapticType">Preset type</param>
+		/// <param name="amount">How many times the haptics should play</param>
+		/// <param name="delayInBetween">The time between haptics <br/><i>Note: Delays are unscaled time</i></param>
+		public void PlayHapticMultiple(HapticPatterns.PresetType hapticType, int amount, int delayInBetween)
+		{
+			StopHaptics();
+
+			hapticMultiple = StartCoroutine(HapticMultiple(hapticType, amount, delayInBetween));
+		}
+
+		private IEnumerator HapticMultiple(HapticPatterns.PresetType hapticType, int amount, int delayInBetween)
+		{
+			ShowDebugLog(
+				$"<color=aqua>Haptic Multiple Emphasis started: <color=orange><color=lime>{hapticType}</color>, delay in between <color=lime>{delayInBetween}</color>, for <color=lime>{amount}</color> times.</color></color>");
+
+			var delay = new WaitForSecondsRealtime(delayInBetween);
+
+			for (int i = 0; i < amount; i++)
+			{
+				PlayHaptic(hapticType);
+				yield return delay;
+			}
+
+			hapticMultiple = null;
+
+			ShowDebugLog("<color=aqua>Haptic Multiple Emphasis <color=red>finished</color>!</color>");
 		}
 
 		public void StopHaptics()
@@ -123,6 +173,16 @@ namespace Fiber.Managers
 
 			if (HapticController.IsPlaying())
 				HapticController.Stop();
+
+			ShowDebugLog("<color=red>Stopped all haptics!</color>");
+		}
+
+		private void ShowDebugLog(string message)
+		{
+#if UNITY_EDITOR
+			if (!showDebug) return;
+			Debug.Log(message, gameObject);
+#endif
 		}
 
 		public enum AdvancedHapticType

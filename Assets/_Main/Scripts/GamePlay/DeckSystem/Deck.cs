@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Fiber.Managers;
@@ -9,6 +10,7 @@ using TriInspector;
 using UnityEditor;
 using UnityEngine;
 using Utilities;
+using Grid = GamePlay.GridSystem.Grid;
 
 namespace GamePlay.DeckSystem
 {
@@ -72,9 +74,29 @@ namespace GamePlay.DeckSystem
 				shape = shapeQueue.Dequeue();
 			}
 
+			StartCoroutine(WaitForSpawning(shape));
+		}
+
+		private readonly WaitForSeconds waitForGrid = new WaitForSeconds(.5f);
+
+		private IEnumerator WaitForSpawning(Shape shape)
+		{
+			do
+			{
+				yield return waitForGrid;
+			} while (Grid.Instance.IsRearranging || Grid.Instance.IsAnyCellBusy());
+
+			yield return null;
+
+			if (LevelManager.Instance.CurrentLevel.LevelType == LevelType.MoveCount && LevelManager.Instance.CurrentLevel.LevelTypeArgument <= 0)
+			{
+				LevelManager.Instance.Lose();
+				yield break;
+			}
+
 			shape.gameObject.SetActive(true);
 			shape.transform.position = spawnPoint.position;
-			shape.transform.DOLocalMove(Vector3.zero, .25f).SetDelay(0.5f).SetEase(Ease.InOutSine).OnComplete(() => { CurrentShape = shape; });
+			shape.transform.DOLocalMove(Vector3.zero, .25f).SetEase(Ease.OutBack).OnComplete(() => { CurrentShape = shape; });
 		}
 
 		private void LoadShapes(bool shuffle = false)

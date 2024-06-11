@@ -13,18 +13,18 @@ MonoBehaviour:
   m_Name: GameConfig
   m_EditorClassIdentifier: 
   companyName: Fiber Games
-  productName: Project-Template
+  productName: Drop&Fold
   productIcon: {fileID: 2800000, guid: 0049bd813b4544af79cb4fe539f26a73, type: 3}
   version: 0.1
-  iOSBundleId: com.fibergames.game
+  iOSBundleId: com.FiberGames.DropAndFold
   teamId: 9JRFGT2VDU
   iOSBuildNo: 0
   androidBundleId: com.fibergames.game
   androidBuildNo: 1
-  facebookId: 0
-  facebookClientToken: 
-  gameId: 
-  gameSecret: 
+  facebookId: 341954448708705
+  facebookClientToken: 94cacb417e942af3a3317127a47db38d
+  gameId: 725635224950208578760493d4124e8114e069111863a61ad18d01ae8befaeaf
+  gameSecret: c63064ae6c72629cec5bb57404bf2b10297f5dc564553619ef4c49c37a312fcb
   background: {fileID: 0}
   loadingScreenLogo: {fileID: 0}
   loadingScreenTitle: {fileID: 0}

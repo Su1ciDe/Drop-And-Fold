@@ -1,10 +1,10 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Fiber.Managers;
 using Fiber.Utilities;
 using Fiber.LevelSystem;
-using GamePlay.Shapes;
 using Models;
 using ScriptableObjects;
 using Unity.EditorCoroutines.Editor;
@@ -99,6 +99,27 @@ namespace LevelEditor
 			{
 				yield return null;
 				SetupDeckGrid();
+			}
+		}
+
+		private void OnGUI()
+		{
+			try
+			{
+				var e = Event.current;
+				enum_GridColor.value = enum_DeckColor.value = e.keyCode switch
+				{
+					KeyCode.Alpha0 => ColorType.None,
+					KeyCode.Alpha1 => ColorType.Blue,
+					KeyCode.Alpha2 => ColorType.Green,
+					KeyCode.Alpha3 => ColorType.Orange,
+					KeyCode.Alpha4 => ColorType.Pink,
+					KeyCode.Alpha5 => ColorType.Red,
+					KeyCode.Alpha6 => ColorType.Yellow,
+				};
+			}
+			catch (SwitchExpressionException)
+			{
 			}
 		}
 
@@ -521,7 +542,14 @@ namespace LevelEditor
 
 			// Change with the deleted level in the LevelManager
 			if (!index.Equals(-1))
+			{
+				EditorUtility.SetDirty(LevelManager.Instance);
 				LevelManager.Instance.Levels[index] = savedLevel;
+				EditorSceneManager.SaveOpenScenes();
+				EditorUtility.ClearDirty(LevelManager.Instance);
+			}
+
+			AssetDatabase.SaveAssets();
 		}
 
 		private void SetupLevel(Level level)

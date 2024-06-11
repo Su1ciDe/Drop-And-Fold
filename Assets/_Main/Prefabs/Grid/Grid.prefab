@@ -46,8 +46,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridCells:
     Arrays: []
+  offset: {x: 0, y: 0}
   cellSize: {x: 1, y: 1}
   xSpacing: 0
   ySpacing: 0
   cellPrefab: {fileID: 3092236246606118843, guid: 8b086f0bf0c7d4067a0ac3323950cd5f, type: 3}
   shapeCellPrefab: {fileID: 415582274762108331, guid: 022c6366aeef84a56a3fccb88eda428a, type: 3}
+  gridFrameCorner_Left: {fileID: 635644989005609273, guid: 381678697676c4f85bdda73fde260d91, type: 3}
+  gridFrameCorner_Right: {fileID: 5649248894977043544, guid: 2133cd9c0611e4a95a8b015568808c56, type: 3}
+  gridFrameHorizontal: {fileID: 5098883387698951455, guid: 6cde3b7a969e94697893a4d9bfa96f9b, type: 3}
+  gridFrameVertical: {fileID: 2504377021865218720, guid: debc5b3cf43d540eba6826118a800161, type: 3}

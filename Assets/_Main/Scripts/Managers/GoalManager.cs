@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
+using Fiber.Managers;
 using Fiber.Utilities;
 using GamePlay.Shapes;
 using Models;
@@ -24,14 +25,29 @@ namespace Managers
 			ShapeCell.OnFoldComplete -= OnFoldCompleted;
 		}
 
-		private void OnFoldCompleted(ColorType colorType, int count,Vector3 pos)
+		private void OnFoldCompleted(ColorType colorType, int count, Vector3 pos)
 		{
-			if (!goalDictionary.TryGetValue(colorType, out var goal)) return;
-			
+			Goal goal = null;
+			if (goalDictionary.ContainsKey(ColorType.None))
+			{
+				goal = goalDictionary[ColorType.None];
+			}
+			else
+			{
+				if (!goalDictionary.TryGetValue(colorType, out goal)) return;
+			}
+
 			goal.CurrentAmount = Mathf.Clamp(goal.CurrentAmount + count, 0, goal.Amount);
 			if (goal.CurrentAmount >= goal.Amount)
 			{
 				goal.Complete();
+				goalDictionary.Remove(goal.ColorType);
+
+				// Level is completed if all the goals are finished
+				if (goalDictionary.Count <= 0)
+				{
+					LevelManager.Instance.Win();
+				}
 			}
 		}
 
