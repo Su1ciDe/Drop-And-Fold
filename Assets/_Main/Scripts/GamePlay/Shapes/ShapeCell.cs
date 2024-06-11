@@ -27,6 +27,7 @@ namespace GamePlay.Shapes
 
 		[Title("References")]
 		[SerializeField] private MeshRenderer meshRenderer;
+		[SerializeField] private MeshRenderer[] eyeLidMeshRenderers;
 		[SerializeField] private Collider col;
 		[Space]
 		[SerializeField] private TrailRenderer trail;
@@ -225,16 +226,26 @@ namespace GamePlay.Shapes
 		{
 			Coordinates = coordinates;
 			ColorType = colorType;
-			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
+
 			col.enabled = true;
+
+			var mat = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
+			meshRenderer.material = mat;
+			foreach (var lidMeshRenderer in eyeLidMeshRenderers)
+				lidMeshRenderer.material = mat;
 		}
 
 		public void SetupShape(ColorType colorType, Vector2Int coordinates)
 		{
 			ColorType = colorType;
-			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
+
 			ShapeCoordinates = coordinates;
 			col.enabled = false;
+
+			var mat = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
+			meshRenderer.material = mat;
+			foreach (var lidMeshRenderer in eyeLidMeshRenderers)
+				lidMeshRenderer.material = mat;
 		}
 
 		#endregion
