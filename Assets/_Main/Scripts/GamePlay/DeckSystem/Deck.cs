@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Fiber.LevelSystem;
 using Fiber.Managers;
 using Fiber.Utilities;
 using Fiber.Utilities.Extensions;
+using GamePlay.Obstacles;
 using GamePlay.Shapes;
 using LevelEditor;
 using TriInspector;
@@ -43,12 +45,14 @@ namespace GamePlay.DeckSystem
 		private void OnEnable()
 		{
 			LevelManager.OnLevelStart += OnLevelStarted;
+			LevelManager.OnLevelLose += OnLevelLost;
 			Shape.OnPlace += OnShapePlaced;
 		}
 
 		private void OnDisable()
 		{
 			LevelManager.OnLevelStart -= OnLevelStarted;
+			LevelManager.OnLevelLose -= OnLevelLost;
 			Shape.OnPlace -= OnShapePlaced;
 		}
 
@@ -57,6 +61,11 @@ namespace GamePlay.DeckSystem
 			LoadShapes();
 
 			SpawnShape();
+		}
+
+		private void OnLevelLost()
+		{
+			StopAllCoroutines();
 		}
 
 		private void OnShapePlaced(Shape shape)
@@ -85,6 +94,8 @@ namespace GamePlay.DeckSystem
 			{
 				yield return waitForGrid;
 			} while (Grid.Instance.IsRearranging || Grid.Instance.IsAnyCellBusy());
+
+			if (StateManager.Instance.CurrentState != GameState.OnStart) yield break;
 
 			yield return null;
 
@@ -133,8 +144,17 @@ namespace GamePlay.DeckSystem
 
 						int coorX = x - middle.firstLeft;
 						int coorY = y - middle.firstTop;
+						var coor = new Vector2Int(coorX, coorY);
 						shapeCell.transform.localPosition = new Vector3(coorX - (middle.width / 2f - ShapeCell.SIZE / 2f), -(coorY - (middle.height / 2f - ShapeCell.SIZE / 2f)));
-						shapeCell.SetupShape(deckCellInfos[x, y].ColorType, new Vector2Int(coorX, coorY));
+
+						shapeCell.SetupShape(deckCellInfos[x, y].ColorType, coor);
+
+						if (deckCellInfos[x, y].Obstacle)
+						{
+							var obstacle = (BaseObstacle)PrefabUtility.InstantiatePrefab(deckCellInfos[x, y].Obstacle, shapeCell.transform);
+							obstacle.SetupShape(coor);
+							shapeCell.CurrentObstacle = obstacle;
+						}
 					}
 				}
 

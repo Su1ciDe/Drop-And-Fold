@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Fiber.Managers;
 using Fiber.Utilities;
+using GamePlay.Obstacles;
 using GamePlay.Shapes;
 using LevelEditor;
 using TriInspector;
@@ -127,18 +128,22 @@ namespace GamePlay.GridSystem
 
 		public IEnumerable<ShapeCell> GetSameNeighbours(GridCell currentCell)
 		{
-			// Up
-			if (currentCell.Y - 1 >= 0 && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X, currentCell.Y - 1].CurrentShapeCell?.ColorType)
-				yield return gridCells[currentCell.X, currentCell.Y - 1].CurrentShapeCell;
-			// Right
-			if (currentCell.X + 1 < GridCells.GetLength(0) && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X + 1, currentCell.Y].CurrentShapeCell?.ColorType)
-				yield return gridCells[currentCell.X + 1, currentCell.Y].CurrentShapeCell;
-			// Down
-			if (currentCell.Y + 1 < gridCells.GetLength(1) && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X, currentCell.Y + 1].CurrentShapeCell?.ColorType)
-				yield return gridCells[currentCell.X, currentCell.Y + 1].CurrentShapeCell;
-			// Left 
-			if (currentCell.X - 1 >= 0 && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X - 1, currentCell.Y].CurrentShapeCell?.ColorType)
-				yield return gridCells[currentCell.X - 1, currentCell.Y].CurrentShapeCell;
+			for (int i = 0; i < Directions.AllDirections.Length; i++)
+			{
+				var shapeCell = TryToGetCell(currentCell.Coordinates + Directions.AllDirections[i])?.CurrentShapeCell;
+				if (shapeCell && !shapeCell.CurrentObstacle && currentCell.CurrentShapeCell.ColorType == shapeCell.ColorType)
+					yield return shapeCell;
+			}
+		}
+
+		public IEnumerable<BaseObstacle> GetObstacleNeighbours(GridCell currentCell)
+		{
+			for (int i = 0; i < Directions.AllDirections.Length; i++)
+			{
+				var shapeCell = TryToGetCell(currentCell.Coordinates + Directions.AllDirections[i])?.CurrentShapeCell;
+				if (shapeCell && shapeCell.CurrentObstacle)
+					yield return shapeCell.CurrentObstacle;
+			}
 		}
 
 		#endregion
@@ -216,13 +221,29 @@ namespace GamePlay.GridSystem
 
 					if (cellInfo.ColorType != ColorType.None)
 					{
+						var coor = new Vector2Int(x, y);
 						var shapeCell = (ShapeCell)PrefabUtility.InstantiatePrefab(shapeCellPrefab, cell.transform);
-						shapeCell.SetupGrid(new Vector2Int(x, y), cellInfo.ColorType);
+						shapeCell.SetupGrid(coor, cellInfo.ColorType);
 						cell.CurrentShapeCell = shapeCell;
+
+						if (cellInfo.Obstacle && cellInfo.Obstacle.ObstacleType == ObstacleType.Attached)
+						{
+							var obstacle = (BaseObstacle)PrefabUtility.InstantiatePrefab(cellInfo.Obstacle, shapeCell.transform);
+							obstacle.SetupGrid(coor);
+							shapeCell.CurrentObstacle = obstacle;
+						}
+					}
+					else if (cellInfo.Obstacle && cellInfo.Obstacle.ObstacleType == ObstacleType.Independent)
+					{
 					}
 				}
 			}
 
+			SetupFrame(xOffset, yOffset, width, height);
+		}
+
+		private void SetupFrame(float xOffset, float yOffset, int width, int height)
+		{
 			var leftCornerPos = new Vector3(-(xOffset + cellSize.x / 2f), -(yOffset + cellSize.y / 2f));
 			var rightCornerPos = new Vector3((xOffset + cellSize.x / 2f), -(yOffset + cellSize.y / 2f));
 

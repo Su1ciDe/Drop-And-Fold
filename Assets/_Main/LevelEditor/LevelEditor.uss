@@ -42,7 +42,7 @@
     width: 140px;
     background-size: 135px;
     border-color: white;
-    border-width: 2;
+    border-width: 0;
     transition: 0.2s all;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -84,9 +84,9 @@
     height: 60px;
     width: 60px;
     transition: 0.2s all;
-    font-size: 40px;
+    font-size: 15px;
     -unity-font-style: bold;
-    -unity-text-outline: 1px;
+    -unity-text-outline: 0.5px;
     -unity-text-outline-color: black;
     -unity-text-align: middle-center;
     -unity-text-overflow-position: middle;

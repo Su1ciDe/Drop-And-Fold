@@ -24,7 +24,7 @@ namespace GamePlay.Shapes
 
 		private void Start()
 		{
-			offset = Grid.Instance.Offset.x - width * ShapeCell.SIZE / 4f;
+			offset = Grid.Instance.Offset.x - width * ShapeCell.SIZE / 2f + ShapeCell.SIZE / 2f;
 		}
 
 		public void Move(float xPos)
@@ -77,7 +77,7 @@ namespace GamePlay.Shapes
 
 			SetHighlights(false);
 			// var highestCell = FindHighestCell();
-			
+
 			// snap to grid
 			var firstCell = ShapeCells[0];
 			var firstGridCell = touchingGridCells[0];

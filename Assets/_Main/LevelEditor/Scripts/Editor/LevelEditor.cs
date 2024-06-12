@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Fiber.Managers;
 using Fiber.Utilities;
 using Fiber.LevelSystem;
+using GamePlay.Obstacles;
 using Models;
 using ScriptableObjects;
 using Unity.EditorCoroutines.Editor;
@@ -35,6 +36,9 @@ namespace LevelEditor
 		// Main Tabs
 		private VisualElement Main_VE;
 		private VisualElement MainTabRow_VE;
+
+		// Obstacles
+		private ListView listView_Obstacles;
 
 		// Grid
 		private VisualElement MainGrid_VE;
@@ -69,7 +73,7 @@ namespace LevelEditor
 
 		private const string LEVELS_PATH = "Assets/_Main/Prefabs/Levels/";
 		private static readonly string LEVEL_BASE_PREFAB_PATH = $"{LEVELS_PATH}_BaseLevel.prefab";
-		// private const string SHAPES_PATH = "Assets/_Main/Prefabs/Shapes";
+		private const string OBSTACLES_PATH = "Assets/_Main/Prefabs/Obstacles";
 
 		#endregion
 
@@ -88,6 +92,8 @@ namespace LevelEditor
 			// Tabs
 			InitMainTabs();
 			InitDeckTabs();
+
+			LoadObstacles();
 
 			SetupElements();
 			SetupGoal();
@@ -141,6 +147,9 @@ namespace LevelEditor
 			Main_VE = rootVisualElement.Q<VisualElement>(nameof(Main_VE));
 			MainTabRow_VE = rootVisualElement.Q<VisualElement>(nameof(MainTabRow_VE));
 
+			// Obstacles
+			listView_Obstacles = rootVisualElement.Q<ListView>(nameof(listView_Obstacles));
+
 			// Grid Setup
 			v2Int_Size = rootVisualElement.Q<Vector2IntField>(nameof(v2Int_Size));
 			btn_Setup = rootVisualElement.Q<Button>(nameof(btn_Setup));
@@ -166,6 +175,52 @@ namespace LevelEditor
 			txt_LevelNo = rootVisualElement.Q<UnsignedIntegerField>(nameof(txt_LevelNo));
 			btn_Save = rootVisualElement.Q<Button>(nameof(btn_Save));
 			btn_Save.clickable.clicked += Save;
+		}
+
+		private List<BaseObstacle> obstacles;
+		private BaseObstacle selectedObstacle;
+
+		private void LoadObstacles()
+		{
+			var obstacleObjects = EditorUtilities.LoadAllAssetsFromPath<Object>(OBSTACLES_PATH).ToArray();
+			var obstaclePrefabs = EditorUtilities.LoadAllAssetsFromPath<BaseObstacle>(OBSTACLES_PATH);
+			obstacles = new List<BaseObstacle>();
+			obstacles.Add(null);
+			foreach (var shape in obstaclePrefabs)
+			{
+				obstacles.Add(shape);
+			}
+
+			listView_Obstacles.makeItem = MakeItem;
+			listView_Obstacles.bindItem = BindItem;
+			listView_Obstacles.itemsSource = obstacles;
+			return;
+
+			VisualElement MakeItem() => EditorUtilities.CreateVisualElement<RadioButton>("radio");
+
+			void BindItem(VisualElement element, int i)
+			{
+				var radio = (RadioButton)element;
+
+				if (i == 0)
+				{
+					radio.name = radio.label = "None";
+				}
+				else
+				{
+					radio.name = "Shape_" + (i);
+					radio.label = obstacles[i].name;
+					LevelEditorUtilities.LoadAssetPreview(radio, obstacleObjects[i - 1], this);
+				}
+
+				radio.RegisterValueChangedCallback(evt => SelectObstacle(evt.newValue, obstacles[i]));
+			}
+		}
+
+		private void SelectObstacle(bool selected, BaseObstacle obstacle)
+		{
+			if (!selected) return;
+			selectedObstacle = obstacle;
 		}
 
 		private void SetupElements()
@@ -415,18 +470,33 @@ namespace LevelEditor
 		private void OnGridCellClicked(IMouseEvent e, CellInfo cellInfo)
 		{
 			if (cellInfo.Button is null) return;
+			if ((ColorType)enum_GridColor.value == ColorType.None)
+			{
+				if (selectedObstacle)
+				{
+					cellInfo.Obstacle = selectedObstacle;
+					cellInfo.Button.text = selectedObstacle.name;
+					cellInfo.Button.style.borderBottomColor = cellInfo.Button.style.borderTopColor = cellInfo.Button.style.borderLeftColor = cellInfo.Button.style.borderRightColor = Color.black;
+					cellInfo.Button.style.borderBottomWidth = cellInfo.Button.style.borderTopWidth = cellInfo.Button.style.borderLeftWidth = cellInfo.Button.style.borderRightWidth = 5;
+				}
+			}
 
-			if (e.button.Equals(0)) // Left click - Place
+			if (e.button.Equals(0) && !selectedObstacle) // Left click - Place
 			{
 				cellInfo.ColorType = (ColorType)enum_GridColor.value;
 				cellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_GridColor.value].Material.color;
 				cellInfo.Button.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)enum_GridColor.value].Material.color;
+				cellInfo.Obstacle = null;
+				cellInfo.Button.style.borderBottomWidth = cellInfo.Button.style.borderTopWidth = cellInfo.Button.style.borderLeftWidth = cellInfo.Button.style.borderRightWidth = 0;
 			}
-			else if (e.button.Equals(1)) // Right click - Delete
+
+			if (e.button.Equals(1)) // Right click - Delete
 			{
 				cellInfo.ColorType = ColorType.None;
 				cellInfo.Color = Color.white;
 				cellInfo.Button.style.backgroundColor = Color.white;
+				cellInfo.Button.text = "";
+				cellInfo.Button.style.borderBottomWidth = cellInfo.Button.style.borderTopWidth = cellInfo.Button.style.borderLeftWidth = cellInfo.Button.style.borderRightWidth = 0;
 			}
 		}
 
@@ -485,17 +555,35 @@ namespace LevelEditor
 
 		private void OnClickedDeckGrid(MouseDownEvent e, DeckCellInfo deckCellInfo)
 		{
-			if (e.button.Equals(0)) // Left click - Place
+			if ((ColorType)enum_GridColor.value == ColorType.None)
+			{
+				if (selectedObstacle)
+				{
+					deckCellInfo.Obstacle = selectedObstacle;
+					deckCellInfo.Button.text = selectedObstacle.name;
+					deckCellInfo.Button.style.borderBottomColor =
+						deckCellInfo.Button.style.borderTopColor = deckCellInfo.Button.style.borderLeftColor = deckCellInfo.Button.style.borderRightColor = Color.black;
+					deckCellInfo.Button.style.borderBottomWidth = deckCellInfo.Button.style.borderTopWidth = deckCellInfo.Button.style.borderLeftWidth = deckCellInfo.Button.style.borderRightWidth = 5;
+				}
+			}
+
+			if (e.button.Equals(0) && !selectedObstacle) // Left click - Place
 			{
 				deckCellInfo.ColorType = (ColorType)enum_DeckColor.value;
 				deckCellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_DeckColor.value].Material.color;
 				deckCellInfo.Button.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)enum_DeckColor.value].Material.color;
+				deckCellInfo.Obstacle = null;
+				deckCellInfo.Button.style.borderBottomWidth = deckCellInfo.Button.style.borderTopWidth = deckCellInfo.Button.style.borderLeftWidth = deckCellInfo.Button.style.borderRightWidth = 0;
 			}
-			else if (e.button.Equals(1)) // Right click - Delete
+
+			if (e.button.Equals(1)) // Right click - Delete
 			{
 				deckCellInfo.ColorType = ColorType.None;
 				deckCellInfo.Color = Color.white;
 				deckCellInfo.Button.style.backgroundColor = Color.white;
+
+				deckCellInfo.Button.text = "";
+				deckCellInfo.Button.style.borderBottomWidth = deckCellInfo.Button.style.borderTopWidth = deckCellInfo.Button.style.borderLeftWidth = deckCellInfo.Button.style.borderRightWidth = 0;
 			}
 		}
 

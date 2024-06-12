@@ -1,3 +1,4 @@
+using GamePlay.Obstacles;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Utilities;
@@ -11,5 +12,6 @@ namespace LevelEditor
 		public Color Color;
 
 		public ColorType ColorType = ColorType.None;
+		public BaseObstacle Obstacle;
 	}
 }
