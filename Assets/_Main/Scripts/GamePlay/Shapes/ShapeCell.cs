@@ -161,7 +161,7 @@ namespace GamePlay.Shapes
 			var currentCell = Grid.Instance.GetCell(Coordinates);
 
 			var neighbours = Grid.Instance.GetSameNeighbours(currentCell);
-			var tempNeighbours = neighbours;
+			var tempNeighbours = new List<ShapeCell>(neighbours);
 			yield return new WaitUntil(() => !tempNeighbours.Any(x => x.IsBusy));
 			IsBusy = true;
 			yield return null;

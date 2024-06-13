@@ -16,6 +16,9 @@ namespace GamePlay.Player
 
 		private bool isDown = false;
 
+		private const float BACK_POS = 6;
+		private const float DAMPING = 6;
+
 		public static event UnityAction<Vector3> OnMouseDown;
 		public static event UnityAction<Vector3> OnMouseUp;
 
@@ -51,6 +54,7 @@ namespace GamePlay.Player
 			if (Input.GetMouseButtonUp(0))
 			{
 				isDown = false;
+				OnMouseUp?.Invoke(Input.mousePosition);
 				OnUp();
 			}
 		}
@@ -63,7 +67,7 @@ namespace GamePlay.Player
 
 			Deck.Instance.CurrentShape.Move(pos.x);
 
-			inputEyeTarget.transform.position = pos + 5 * Vector3.back;
+			inputEyeTarget.transform.position = Vector3.Lerp(inputEyeTarget.transform.position, pos + BACK_POS * Vector3.back, Time.deltaTime * DAMPING);
 		}
 
 		private void OnDrag()
@@ -74,7 +78,7 @@ namespace GamePlay.Player
 
 			Deck.Instance.CurrentShape.Move(pos.x);
 
-			inputEyeTarget.transform.position = pos + 5 * Vector3.back;
+			inputEyeTarget.transform.position = Vector3.Lerp(inputEyeTarget.transform.position, pos + BACK_POS * Vector3.back, Time.deltaTime * DAMPING);
 		}
 
 		private void OnUp()

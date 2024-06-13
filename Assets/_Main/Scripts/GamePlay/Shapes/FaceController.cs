@@ -51,10 +51,30 @@ namespace GamePlay.Shapes
 
 		private void OnMouseDown(Vector3 pos)
 		{
+			for (var i = 0; i < lookAtConstraints.Length; i++)
+			{
+				var eyeTarget_CS = lookAtConstraints[i].GetSource(0);
+				eyeTarget_CS.weight = 0;
+				lookAtConstraints[i].SetSource(0, eyeTarget_CS);
+
+				var inputEyeTarget_CS = lookAtConstraints[i].GetSource(1);
+				inputEyeTarget_CS.weight = 1;
+				lookAtConstraints[i].SetSource(1, inputEyeTarget_CS);
+			}
 		}
 
 		private void OnMouseUp(Vector3 pos)
 		{
+			for (var i = 0; i < lookAtConstraints.Length; i++)
+			{
+				var eyeTarget_CS = lookAtConstraints[i].GetSource(0);
+				eyeTarget_CS.weight = 1;
+				lookAtConstraints[i].SetSource(0, eyeTarget_CS);
+
+				var inputEyeTarget_CS = lookAtConstraints[i].GetSource(1);
+				inputEyeTarget_CS.weight = 0;
+				lookAtConstraints[i].SetSource(1, inputEyeTarget_CS);
+			}
 		}
 
 		private IEnumerator PlayRandomEyesAnimation()
