@@ -42,13 +42,14 @@ namespace Fiber.LevelSystem
 		{
 			LevelManager.OnLevelWin += OnLevelWon;
 			LevelManager.OnLevelLose += OnLevelLost;
-			ShapeCell.OnFoldComplete +=OnFoldComplete;
+			ShapeCell.OnFoldComplete += OnFoldComplete;
 		}
 
 		private void OnDisable()
 		{
 			LevelManager.OnLevelWin -= OnLevelWon;
 			LevelManager.OnLevelLose -= OnLevelLost;
+			ShapeCell.OnFoldComplete -= OnFoldComplete;
 		}
 
 		private void OnDestroy()
@@ -100,8 +101,7 @@ namespace Fiber.LevelSystem
 			currentMoveCount--;
 			OnMoveCountChange?.Invoke(currentMoveCount);
 		}
-		
-		
+
 		private void OnFoldComplete(ColorType colorType, int amount, Vector3 position)
 		{
 			StartCoroutine(OnFoldCompleteCoroutine());
@@ -111,7 +111,7 @@ namespace Fiber.LevelSystem
 		{
 			yield return null;
 
-			if (currentMoveCount<=0)
+			if (currentMoveCount <= 0)
 			{
 				LevelManager.Instance.Lose();
 			}
