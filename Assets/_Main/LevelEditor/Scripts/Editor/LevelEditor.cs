@@ -62,7 +62,7 @@ namespace LevelEditor
 		private VisualElement RandomizerColors_VE;
 		private MinMaxSlider minMaxSlider_CellCount;
 		private IntegerField intField_CellCountMin, intField_CellCountMax;
-		private SliderInt slider_WoodObstaclePercentage;
+		private SliderInt slider_Wood1ObstaclePercentage, slider_Wood2ObstaclePercentage;
 		private Button btn_Randomize;
 		private ListView listView_RandomizerColors;
 
@@ -185,7 +185,8 @@ namespace LevelEditor
 			minMaxSlider_CellCount = rootVisualElement.Q<MinMaxSlider>(nameof(minMaxSlider_CellCount));
 			intField_CellCountMin = rootVisualElement.Q<IntegerField>(nameof(intField_CellCountMin));
 			intField_CellCountMax = rootVisualElement.Q<IntegerField>(nameof(intField_CellCountMax));
-			slider_WoodObstaclePercentage = rootVisualElement.Q<SliderInt>(nameof(slider_WoodObstaclePercentage));
+			slider_Wood1ObstaclePercentage = rootVisualElement.Q<SliderInt>(nameof(slider_Wood1ObstaclePercentage));
+			slider_Wood2ObstaclePercentage = rootVisualElement.Q<SliderInt>(nameof(slider_Wood2ObstaclePercentage));
 			btn_Randomize = rootVisualElement.Q<Button>(nameof(btn_Randomize));
 
 			// Options
@@ -742,13 +743,29 @@ namespace LevelEditor
 				{
 					PlaceDeckCell(currentCell, currentColor);
 
-					if (!slider_WoodObstaclePercentage.value.Equals(0))
+					if (!slider_Wood1ObstaclePercentage.value.Equals(0))
 					{
 						var r = Random.Range(1, 101);
-						if (r <= slider_WoodObstaclePercentage.value)
+						if (r <= slider_Wood1ObstaclePercentage.value)
 						{
-							// Wood obstacle is at index 1
-							PlaceObstacleToDeckCell(currentCell, obstacles[1]);
+							if (!currentCell.Obstacle)
+							{
+								// Wood 1 obstacle is at index 1
+								PlaceObstacleToDeckCell(currentCell, obstacles[1]);
+							}
+						}
+					}
+
+					if (!slider_Wood2ObstaclePercentage.value.Equals(0))
+					{
+						var r = Random.Range(1, 101);
+						if (r <= slider_Wood2ObstaclePercentage.value)
+						{
+							if (!currentCell.Obstacle)
+							{
+								// Wood 2 obstacle is at index 2
+								PlaceObstacleToDeckCell(currentCell, obstacles[2]);
+							}
 						}
 					}
 
