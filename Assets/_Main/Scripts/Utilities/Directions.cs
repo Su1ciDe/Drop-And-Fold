@@ -9,6 +9,6 @@ namespace Utilities
 		public static Vector2Int Down = new Vector2Int(0, 1);
 		public static Vector2Int Left = new Vector2Int(-1, 0);
 
-		public static readonly Vector2Int[] AllDirections = new[] { Up, Right, Down, Left };
+		public static readonly Vector2Int[] AllDirections = { Up, Right, Down, Left };
 	}
 }

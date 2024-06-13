@@ -97,6 +97,9 @@ namespace Fiber.Build.ProjectConfig
 		[Button(ButtonSizes.Large), PropertySpace(20)]
 		public void Apply()
 		{
+			PlayerSettings.SplashScreen.show = true;
+			PlayerSettings.SplashScreen.showUnityLogo = false;
+			
 			PlayerSettings.companyName = companyName;
 			PlayerSettings.productName = productName;
 			for (var i = 0; i < 19; i++)

@@ -10,7 +10,7 @@ namespace LevelEditor
 			var root = new VisualElement { style = { flexGrow = 1, flexDirection = FlexDirection.Row } };
 
 			// Color enum
-			var colorEnum = new EnumField { name = "enum_Color", label = "Color", style = { flexGrow = 1 } };
+			var colorEnum = new EnumField { name = "enum_Color", label = "Color", style = { flexGrow = 1, width = .6f} };
 			colorEnum.Init(ColorType.None);
 
 			// Amount
@@ -18,7 +18,7 @@ namespace LevelEditor
 			{
 				name = "uintField_GoalAmount",
 				label = "Gaol Amount",
-				style = { flexGrow = 1 },
+				style = { flexGrow = 1, width = .4f },
 				value = 1,
 				maxLength = 2
 			};

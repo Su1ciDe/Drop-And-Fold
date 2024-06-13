@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/_Main/LevelEditor/LevelEditor.uss?fileID=7433441132597879392&amp;guid=ee7461ebeba464e93a16aa9b442b9583&amp;type=3#LevelEditor" />
     <ui:VisualElement name="Load" class="bordered-box" style="flex-grow: 0; flex-shrink: 0;">
         <ui:Label tabindex="-1" text="Load" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Load" class="header" />
-        <ui:VisualElement name="Load_VE" style="flex-grow: 0; flex-direction: row-reverse; height: 30px;">
+        <ui:VisualElement name="Load_VE" style="flex-grow: 0; flex-direction: row-reverse; height: 25px;">
             <ui:Button text="Load Level" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btn_Load" style="height: 25px; width: 125px;" />
         </ui:VisualElement>
     </ui:VisualElement>
@@ -30,6 +30,20 @@
     </ui:VisualElement>
     <ui:VisualElement name="MainDeck_VE" class="bordered-box" style="flex-grow: 1;">
         <ui:Label tabindex="-1" text="Deck" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Deck" class="header" />
+        <ui:VisualElement name="Randomizer" style="flex-grow: 0;">
+            <ui:Label tabindex="-1" text="Randomizer" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Randomizer" style="-unity-font-style: bold; font-size: 16px;" />
+            <ui:VisualElement name="Separator" class="separator" style="flex-grow: 0; height: 2px; width: 99%; background-color: rgb(202, 202, 202); margin-top: 5px; margin-bottom: 5px; margin-right: -5px; margin-left: 5px;" />
+            <ui:UnsignedIntegerField label="Shape Count" value="1" name="uintField_ShapeCount" />
+            <ui:VisualElement name="RandomizerColors_VE" style="flex-grow: 1;" />
+            <ui:VisualElement name="MinMaxCellCount_VE" style="flex-grow: 1; flex-direction: row;">
+                <ui:MinMaxSlider label="Min/Max Cell Count" min-value="1" max-value="10" low-limit="1" high-limit="16" name="minMaxSlider_CellCount" style="flex-grow: 1;" />
+                <ui:IntegerField label="Min" value="0" name="intField_CellCountMin" />
+                <ui:IntegerField label="Max" value="0" name="intField_CellCountMax" />
+            </ui:VisualElement>
+            <ui:SliderInt label="Wood Obstacle Percent" high-value="100" show-input-field="true" name="slider_WoodObstaclePercentage" />
+            <ui:Button text="Randomize" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btn_Randomize" style="height: 35px;" />
+            <ui:VisualElement name="Separator" class="separator" style="flex-grow: 0; height: 2px; width: 99%; background-color: rgb(202, 202, 202); margin-top: 5px; margin-bottom: 5px; margin-right: -5px; margin-left: 5px;" />
+        </ui:VisualElement>
         <ui:EnumField label="Color" type="Utilities.ColorType, Assembly-CSharp" value="None" name="enum_DeckColor" />
         <ui:VisualElement name="DeckTabs_VE" style="flex-grow: 0; flex-direction: row; height: 50px; flex-shrink: 1;">
             <ui:VisualElement name="DeckTabsRow_VE" style="flex-grow: 1; height: 35px; max-height: 35px; flex-direction: row;" />
