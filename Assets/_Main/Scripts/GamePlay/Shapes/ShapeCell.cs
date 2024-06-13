@@ -214,8 +214,8 @@ namespace GamePlay.Shapes
 			foreach (var shapeCell in neighbours)
 			{
 				currentCell.CurrentShapeCell = null;
-				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.OutBack);
-				transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.OutBack).OnComplete(() =>
+				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack);
+				transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() =>
 				{
 					Destroy(shapeCell.gameObject);
 					Destroy(gameObject);

@@ -213,7 +213,7 @@ Animator:
   m_GameObject: {fileID: 6173689130673798165}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 888988ba44c0f4eba8d55945fc02eaeb, type: 2}
+  m_Controller: {fileID: 9100000, guid: 51f6e3d3193bd4994b8959e99ff8a060, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -236,11 +236,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78bc9d6eb3e04c4e9527e2b266cd5bcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  faceData: {fileID: 11400000, guid: 6d4d3488aa9e64e7c8a3303e78fa3dd2, type: 2}
   eyesAnimator: {fileID: 3843659774175993432}
   eyelidAnimators:
   - {fileID: 7430030611792272076}
   - {fileID: 2439258090351749663}
-  faceData: {fileID: 11400000, guid: 6d4d3488aa9e64e7c8a3303e78fa3dd2, type: 2}
+  animatorControllers:
+  - {fileID: 9100000, guid: 51f6e3d3193bd4994b8959e99ff8a060, type: 2}
+  - {fileID: 9100000, guid: c94f88e6e00c54bfcbb50ff3d45b3568, type: 2}
+  - {fileID: 9100000, guid: 888988ba44c0f4eba8d55945fc02eaeb, type: 2}
   lookAtConstraints:
   - {fileID: 6938373928772927396}
   - {fileID: 2778500403108941687}
@@ -386,15 +390,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7313973328639720058, guid: 98b0f7de5905bd44095f133d33fb5d3f, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.15
+      value: 0.103596
       objectReference: {fileID: 0}
     - target: {fileID: 7313973328639720058, guid: 98b0f7de5905bd44095f133d33fb5d3f, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.15
+      value: 0.103596
       objectReference: {fileID: 0}
     - target: {fileID: 7313973328639720058, guid: 98b0f7de5905bd44095f133d33fb5d3f, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.15
+      value: 0.103596
       objectReference: {fileID: 0}
     - target: {fileID: 7313973328639720058, guid: 98b0f7de5905bd44095f133d33fb5d3f, type: 3}
       propertyPath: m_LocalPosition.x

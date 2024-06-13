@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Fiber.Utilities.Extensions;
 using GamePlay.Player;
 using ScriptableObjects;
 using UnityEngine;
@@ -9,9 +10,10 @@ namespace GamePlay.Shapes
 {
 	public class FaceController : MonoBehaviour
 	{
+		[SerializeField] private FaceDataSO faceData;
 		[SerializeField] private Animator eyesAnimator;
 		[SerializeField] private List<Animator> eyelidAnimators;
-		[SerializeField] private FaceDataSO faceData;
+		[SerializeField] private RuntimeAnimatorController[] animatorControllers;
 
 		[Space]
 		[SerializeField] private LookAtConstraint[] lookAtConstraints;
@@ -24,6 +26,7 @@ namespace GamePlay.Shapes
 
 		private void Awake()
 		{
+			eyesAnimator.runtimeAnimatorController = animatorControllers.RandomItem();
 			foreach (var lookAtConstraint in lookAtConstraints)
 			{
 				var source = new ConstraintSource { sourceTransform = Player.Player.Instance.PlayerInputs.InputEyeTarget, weight = 0 };
