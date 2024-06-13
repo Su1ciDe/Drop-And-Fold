@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using GamePlay.Player;
 using ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace GamePlay.Shapes
 {
@@ -11,14 +13,48 @@ namespace GamePlay.Shapes
 		[SerializeField] private List<Animator> eyelidAnimators;
 		[SerializeField] private FaceDataSO faceData;
 
-		private readonly string baseAnimationId = "base";
+		[Space]
+		[SerializeField] private LookAtConstraint[] lookAtConstraints;
+
+		private bool isBlinkPaused = false;
+
+		private const string BASE_ANIMATION_ID = "base";
 		private readonly string[] eyeAnimationTriggers = { "base", "top", "topRight", "topLeft", "bottom", "bottomRight", "bottomLeft" };
-		private const string BLINK_ANIMATION_TRIGGER = "blink";
+		private static readonly int blink = Animator.StringToHash("blink");
+
+		private void Awake()
+		{
+			foreach (var lookAtConstraint in lookAtConstraints)
+			{
+				var source = new ConstraintSource { sourceTransform = Player.Player.Instance.PlayerInputs.InputEyeTarget, weight = 0 };
+				lookAtConstraint.AddSource(source);
+			}
+		}
 
 		private void Start()
 		{
 			StartCoroutine(PlayRandomEyesAnimation());
 			StartCoroutine(PlayBlinkAnimation());
+		}
+
+		private void OnEnable()
+		{
+			PlayerInputs.OnMouseDown += OnMouseDown;
+			PlayerInputs.OnMouseUp += OnMouseUp;
+		}
+
+		private void OnDisable()
+		{
+			PlayerInputs.OnMouseDown -= OnMouseDown;
+			PlayerInputs.OnMouseUp -= OnMouseUp;
+		}
+
+		private void OnMouseDown(Vector3 pos)
+		{
+		}
+
+		private void OnMouseUp(Vector3 pos)
+		{
 		}
 
 		private IEnumerator PlayRandomEyesAnimation()
@@ -41,15 +77,38 @@ namespace GamePlay.Shapes
 		{
 			while (isActiveAndEnabled)
 			{
+				yield return new WaitUntil(() => !isBlinkPaused);
+
 				var blinkDuration = Random.Range(faceData.MinBlinkWaitDuration, faceData.MaxBlinkWaitDuration);
 				var blinkSpeed = Random.Range(faceData.MinBlinkSpeed, faceData.MaxBlinkSpeed);
+
 				yield return new WaitForSeconds(blinkDuration);
+
 				for (int i = 0; i < eyelidAnimators.Count; i++)
 				{
 					eyelidAnimators[i].speed = 1f / blinkSpeed;
-					eyelidAnimators[i].SetTrigger(BLINK_ANIMATION_TRIGGER);
+					eyelidAnimators[i].SetTrigger(blink);
 				}
 			}
+		}
+
+		public void Blink(float speed, float duration)
+		{
+			StartCoroutine(BlinkOnce(speed, duration));
+		}
+
+		private IEnumerator BlinkOnce(float speed, float duration)
+		{
+			isBlinkPaused = true;
+			for (int i = 0; i < eyelidAnimators.Count; i++)
+			{
+				eyelidAnimators[i].speed = speed;
+				eyelidAnimators[i].SetTrigger(blink);
+			}
+
+			yield return new WaitForSeconds(duration);
+
+			isBlinkPaused = false;
 		}
 	}
 }

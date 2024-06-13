@@ -34,13 +34,15 @@ namespace GamePlay.Shapes
 		[SerializeField] private Collider col;
 		[Space]
 		[SerializeField] private TrailRenderer trail;
+		[Space]
+		[SerializeField] private FaceController faceController;
 
 		private ShapeCell currentShapeCellUnder;
 		private GridCell currentGridCellUnder;
 
 		public static readonly float SIZE = 1;
-		protected const float PLACE_SPEED = 15;
 		public static float FOLD_DURATION = .25f;
+		protected const float PLACE_SPEED = 15;
 		protected const float DESTROY_DURATION = .25f;
 		protected const string SEPARATOR_TAG = "Separator";
 
@@ -127,6 +129,7 @@ namespace GamePlay.Shapes
 				{
 					// squash
 					var shapeCellUnder = Grid.Instance.TryToGetCell(Coordinates.x, i).CurrentShapeCell;
+					shapeCellUnder.faceController.Blink(1 / (SQUASH_DURATION * 2f), SQUASH_DURATION * 2);
 					if (shapeCellUnder.IsBusy) continue;
 					shapeCellUnder.transform.DOComplete();
 					shapeCellUnder.transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - i) + shapeCellUnder.transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
@@ -136,10 +139,10 @@ namespace GamePlay.Shapes
 				transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - Coordinates.y) + transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
 				transform.DOPunchScale(SQUASH_AMOUNT * Vector3.one, SQUASH_DURATION, 1).OnComplete(() =>
 				{
+					IsBusy = false;
 					// Check folding
 					if (isActiveAndEnabled && !CurrentObstacle && StateManager.Instance.CurrentState == GameState.OnStart)
 						CheckFold();
-					IsBusy = false;
 				});
 
 				col.enabled = true;

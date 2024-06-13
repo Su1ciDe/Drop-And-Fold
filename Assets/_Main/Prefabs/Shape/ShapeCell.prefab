@@ -241,6 +241,9 @@ MonoBehaviour:
   - {fileID: 7430030611792272076}
   - {fileID: 2439258090351749663}
   faceData: {fileID: 11400000, guid: 6d4d3488aa9e64e7c8a3303e78fa3dd2, type: 2}
+  lookAtConstraints:
+  - {fileID: 6938373928772927396}
+  - {fileID: 2778500403108941687}
 --- !u!1 &7805384479695675148
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,15 +353,9 @@ MonoBehaviour:
   - {fileID: 1731800029434964079}
   - {fileID: 6831309470580775100}
   - {fileID: 2059282798208788560}
-  eyeLidMeshRenderers:
-  - {fileID: 1352884021419040441}
-  - {fileID: 7134143284962452189}
-  - {fileID: 6053772415320338026}
-  - {fileID: 2721485559245378062}
-  - {fileID: 1731800029434964079}
-  - {fileID: 6831309470580775100}
   col: {fileID: 6845929376342375551}
   trail: {fileID: 7468531149396770111}
+  faceController: {fileID: 8415498252155973587}
 --- !u!1001 &628140500826481727
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -462,6 +459,11 @@ MeshRenderer:
 --- !u!23 &6053772415320338026 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 6680188013390482005, guid: 98b0f7de5905bd44095f133d33fb5d3f, type: 3}
+  m_PrefabInstance: {fileID: 628140500826481727}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1183024399 &6938373928772927396 stripped
+LookAtConstraint:
+  m_CorrespondingSourceObject: {fileID: 7565365842726820763, guid: 98b0f7de5905bd44095f133d33fb5d3f, type: 3}
   m_PrefabInstance: {fileID: 628140500826481727}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &7870015647844671045 stripped
@@ -632,6 +634,11 @@ PrefabInstance:
 --- !u!23 &1352884021419040441 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 6680188013390482005, guid: 98b0f7de5905bd44095f133d33fb5d3f, type: 3}
+  m_PrefabInstance: {fileID: 5652759993079665900}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1183024399 &2778500403108941687 stripped
+LookAtConstraint:
+  m_CorrespondingSourceObject: {fileID: 7565365842726820763, guid: 98b0f7de5905bd44095f133d33fb5d3f, type: 3}
   m_PrefabInstance: {fileID: 5652759993079665900}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &3166823003972300438 stripped

@@ -11,7 +11,13 @@ namespace GamePlay.Player
 	{
 		public bool CanInput { get; set; } = true;
 
+		[SerializeField] private Transform inputEyeTarget;
+		public Transform InputEyeTarget => inputEyeTarget;
+
+		private bool isDown = false;
+
 		public static event UnityAction<Vector3> OnMouseDown;
+		public static event UnityAction<Vector3> OnMouseUp;
 
 		private void OnEnable()
 		{
@@ -32,6 +38,7 @@ namespace GamePlay.Player
 			if (!CanInput) return;
 			if (Input.GetMouseButtonDown(0))
 			{
+				isDown = true;
 				OnMouseDown?.Invoke(Input.mousePosition);
 				OnDown();
 			}
@@ -43,6 +50,7 @@ namespace GamePlay.Player
 
 			if (Input.GetMouseButtonUp(0))
 			{
+				isDown = false;
 				OnUp();
 			}
 		}
@@ -51,14 +59,22 @@ namespace GamePlay.Player
 		{
 			if (!Deck.Instance.CurrentShape) return;
 
-			GetMovePosition();
+			var pos = GetMovePosition();
+
+			Deck.Instance.CurrentShape.Move(pos.x);
+
+			inputEyeTarget.transform.position = pos + 5 * Vector3.back;
 		}
 
 		private void OnDrag()
 		{
 			if (!Deck.Instance.CurrentShape) return;
 
-			GetMovePosition();
+			var pos = GetMovePosition();
+
+			Deck.Instance.CurrentShape.Move(pos.x);
+
+			inputEyeTarget.transform.position = pos + 5 * Vector3.back;
 		}
 
 		private void OnUp()
@@ -68,11 +84,12 @@ namespace GamePlay.Player
 			Deck.Instance.CurrentShape.Place();
 		}
 
-		private void GetMovePosition()
+		private Vector3 GetMovePosition()
 		{
 			var mousePos = Input.mousePosition;
 			var pos = Helper.MainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, -Helper.MainCamera.transform.position.z));
-			Deck.Instance.CurrentShape.Move(pos.x);
+
+			return pos;
 		}
 
 		private void OnLevelStarted()
