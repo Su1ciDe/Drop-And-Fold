@@ -490,18 +490,12 @@ namespace LevelEditor
 		private void OnGridCellClicked(IMouseEvent e, CellInfo cellInfo)
 		{
 			if (cellInfo.Button is null) return;
-			if ((ColorType)enum_GridColor.value == ColorType.None)
+			if (selectedObstacle)
 			{
-				if (selectedObstacle)
-				{
-					cellInfo.Obstacle = selectedObstacle;
-					cellInfo.Button.text = selectedObstacle.name;
-					cellInfo.Button.style.borderBottomColor = cellInfo.Button.style.borderTopColor = cellInfo.Button.style.borderLeftColor = cellInfo.Button.style.borderRightColor = Color.black;
-					cellInfo.Button.style.borderBottomWidth = cellInfo.Button.style.borderTopWidth = cellInfo.Button.style.borderLeftWidth = cellInfo.Button.style.borderRightWidth = 5;
-				}
+				PlaceGridObstacle(cellInfo, selectedObstacle);
 			}
 
-			if (e.button.Equals(0) && !selectedObstacle) // Left click - Place
+			if (e.button.Equals(0) && (ColorType)enum_GridColor.value != ColorType.None && !selectedObstacle) // Left click - Place
 			{
 				cellInfo.ColorType = (ColorType)enum_GridColor.value;
 				cellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_GridColor.value].Material.color;
@@ -518,6 +512,14 @@ namespace LevelEditor
 				cellInfo.Button.text = "";
 				cellInfo.Button.style.borderBottomWidth = cellInfo.Button.style.borderTopWidth = cellInfo.Button.style.borderLeftWidth = cellInfo.Button.style.borderRightWidth = 0;
 			}
+		}
+
+		private void PlaceGridObstacle(CellInfo cellInfo, BaseObstacle obstacle)
+		{
+			cellInfo.Obstacle = obstacle;
+			cellInfo.Button.text = obstacle.name;
+			cellInfo.Button.style.borderBottomColor = cellInfo.Button.style.borderTopColor = cellInfo.Button.style.borderLeftColor = cellInfo.Button.style.borderRightColor = Color.black;
+			cellInfo.Button.style.borderBottomWidth = cellInfo.Button.style.borderTopWidth = cellInfo.Button.style.borderLeftWidth = cellInfo.Button.style.borderRightWidth = 5;
 		}
 
 		#endregion
@@ -868,6 +870,12 @@ namespace LevelEditor
 					cell.ColorType = levelCell.CurrentShapeCell.ColorType;
 					cell.Color = colorDataSO.ColorDatas[cell.ColorType].Material.color;
 					cell.Button.style.backgroundColor = cell.Color;
+
+					if (levelCell.CurrentShapeCell.CurrentObstacle)
+					{
+						var obstaclePrefab = PrefabUtility.GetNearestPrefabInstanceRoot(levelCell.CurrentShapeCell.CurrentObstacle).GetComponent<BaseObstacle>();
+						PlaceGridObstacle(cell, obstaclePrefab);
+					}
 				}
 			}
 
@@ -884,6 +892,12 @@ namespace LevelEditor
 					cell.Coordinates = levelShapeCell.ShapeCoordinates;
 					cell.Color = colorDataSO.ColorDatas[levelShapeCell.ColorType].Material.color;
 					cell.Button.style.backgroundColor = cell.Color;
+
+					if (levelShapeCell.CurrentObstacle)
+					{
+						var obstaclePrefab = PrefabUtility.GetNearestPrefabInstanceRoot(levelShapeCell.CurrentObstacle).GetComponent<BaseObstacle>();
+						PlaceObstacleToDeckCell(cell, obstaclePrefab);
+					}
 				}
 			}
 
