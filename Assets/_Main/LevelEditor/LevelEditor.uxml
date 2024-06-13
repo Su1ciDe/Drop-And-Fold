@@ -49,7 +49,7 @@
             <ui:VisualElement name="DeckTabsRow_VE" style="flex-grow: 1; height: 35px; max-height: 35px; flex-direction: row;" />
             <ui:Button text="+" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btn_AddDeckTab" style="width: 30px; height: 30px; -unity-font-style: bold; font-size: 25px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="Deck_VE" style="flex-grow: 1;" />
+        <ui:ScrollView name="Deck_VE" style="flex-grow: 1;" />
     </ui:VisualElement>
     <ui:VisualElement name="Options_VE" class="bordered-box" style="flex-grow: 0; flex-shrink: 0;">
         <ui:Label tabindex="-1" text="Options" parse-escape-sequences="true" display-tooltip-when-elided="true" name="lbl_Options" class="header" />
