@@ -3,6 +3,7 @@ using Fiber.Utilities;
 using GamePlay.DeckSystem;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace GamePlay.Player
 {
@@ -27,6 +28,7 @@ namespace GamePlay.Player
 
 		private void Update()
 		{
+			if (EventSystem.current.IsPointerOverGameObject()) return;
 			if (!CanInput) return;
 			if (Input.GetMouseButtonDown(0))
 			{

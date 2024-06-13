@@ -44,6 +44,10 @@ namespace GamePlay.Shapes
 		protected const float DESTROY_DURATION = .25f;
 		protected const string SEPARATOR_TAG = "Separator";
 
+		private const float SQUASH_AMOUNT = .15f;
+		private const float SQUASH_MOVE_AMOUNT = .2f;
+		private const float SQUASH_DURATION = .2f;
+
 		public static event UnityAction<ColorType, int, Vector3> OnFoldComplete; //ColorType colorType, int foldCount, Vector3 foldPosition
 
 		private void OnEnable()
@@ -117,13 +121,28 @@ namespace GamePlay.Shapes
 			{
 				AudioManager.Instance.PlayAudio(AudioName.Place);
 
-				transform.DOPunchScale(0.25f * Vector3.one, .2f, 1);
-				// Check folding
-				if (isActiveAndEnabled && !CurrentObstacle && StateManager.Instance.CurrentState == GameState.OnStart)
-					CheckFold();
+				// feedbacks
+				var height = Grid.Instance.GridCells.GetLength(1);
+				for (int i = Grid.Instance.GridCells.GetLength(1) - 1; i > Coordinates.y; i--)
+				{
+					// squash
+					var shapeCellUnder = Grid.Instance.TryToGetCell(Coordinates.x, i).CurrentShapeCell;
+					if (shapeCellUnder.IsBusy) continue;
+					shapeCellUnder.transform.DOComplete();
+					shapeCellUnder.transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - i) + shapeCellUnder.transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+					shapeCellUnder.transform.DOScaleY(1f - SQUASH_AMOUNT, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+				}
+
+				transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - Coordinates.y) + transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+				transform.DOPunchScale(SQUASH_AMOUNT * Vector3.one, SQUASH_DURATION, 1).OnComplete(() =>
+				{
+					// Check folding
+					if (isActiveAndEnabled && !CurrentObstacle && StateManager.Instance.CurrentState == GameState.OnStart)
+						CheckFold();
+					IsBusy = false;
+				});
 
 				col.enabled = true;
-				IsBusy = false;
 				trail.emitting = false;
 			});
 		}
