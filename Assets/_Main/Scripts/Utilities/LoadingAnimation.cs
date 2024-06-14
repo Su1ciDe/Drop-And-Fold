@@ -1,5 +1,7 @@
 using System.Collections;
+using Fiber.Managers;
 using Fiber.UI;
+using Fiber.Utilities.Extensions;
 using GamePlay.Shapes;
 using UnityEngine;
 
@@ -16,7 +18,9 @@ namespace Utilities
 		[SerializeField] private Transform moveOutPoint;
 
 		private bool isFold;
-		
+
+		private const ColorType COLOR_TYPE = ColorType.None;
+
 		private void OnEnable()
 		{
 			if (LoadingPanelController.Instance)
@@ -42,11 +46,16 @@ namespace Utilities
 		private IEnumerator PlayAnimation()
 		{
 			yield return null;
-			
+
+			var r = COLOR_TYPE.RandomItem();
+			var mat = GameManager.Instance.ColorDataSO.ColorDatas[r].Material;
+			middleCell.SetupMaterials(mat);
+
 			middleCell.Fold(neighbourCells);
 
 			for (var i = 0; i < neighbourCells.Length; i++)
 			{
+				neighbourCells[i].SetupMaterials(mat);
 			}
 		}
 	}

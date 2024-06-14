@@ -4,7 +4,7 @@ namespace GamePlay.Shapes
 {
 	public class LoadingShapeCell : ShapeCell
 	{
-		public void Fold(LoadingShapeCell[] cells)
+		public void Fold(ShapeCell[] cells)
 		{
 			StartCoroutine(Fold(cells, cells.Length, false));
 		}

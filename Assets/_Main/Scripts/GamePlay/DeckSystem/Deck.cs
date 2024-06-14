@@ -5,6 +5,7 @@ using Fiber.Managers;
 using Fiber.LevelSystem;
 using Fiber.Utilities;
 using Fiber.Utilities.Extensions;
+using GamePlay.GridSystem.GridBoosters;
 using GamePlay.Obstacles;
 using GamePlay.Shapes;
 using LevelEditor;
@@ -98,6 +99,12 @@ namespace GamePlay.DeckSystem
 			if (StateManager.Instance.CurrentState != GameState.OnStart) yield break;
 
 			yield return null;
+
+			// if (Bomb.IsBombActive)
+			// {
+			// 	Debug.Log(" waiting for bomb!");
+			// 	yield return new WaitUntilAction(ref GridBooster.OnBoost);
+			// }
 
 			if (LevelManager.Instance.CurrentLevel.LevelType == LevelType.MoveCount && LevelManager.Instance.CurrentLevel.LevelTypeArgument <= 0)
 			{

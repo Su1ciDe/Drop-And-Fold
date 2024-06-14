@@ -10,6 +10,8 @@ using Fiber.Utilities.Extensions;
 using GamePlay.Obstacles;
 using GamePlay.GridSystem;
 using GamePlay.DeckSystem;
+using GamePlay.GridSystem.GridBoosters;
+using Models;
 using TriInspector;
 using UnityEngine;
 using UnityEngine.Events;
@@ -19,15 +21,11 @@ using Grid = GamePlay.GridSystem.Grid;
 namespace GamePlay.Shapes
 {
 	[SelectionBase]
-	public class ShapeCell : MonoBehaviour
+	public class ShapeCell : Tile
 	{
-		[field: Title("Properties")]
-		[field: SerializeField, ReadOnly] public ColorType ColorType { get; private set; }
-		[field: SerializeField, ReadOnly] public Vector2Int Coordinates { get; private set; }
 		[field: SerializeField, ReadOnly] public Vector2Int ShapeCoordinates { get; private set; }
+		[field: SerializeField, ReadOnly] public ColorType ColorType { get; private set; }
 		[field: SerializeField, ReadOnly] public BaseObstacle CurrentObstacle { get; set; }
-
-		public bool IsBusy { get; private set; } = false;
 
 		[Title("References")]
 		[SerializeField] private MeshRenderer[] meshRenderers;
@@ -36,19 +34,10 @@ namespace GamePlay.Shapes
 		[SerializeField] private TrailRenderer trail;
 		[Space]
 		[SerializeField] private FaceController faceController;
+		public FaceController FaceController => faceController;
 
 		private ShapeCell currentShapeCellUnder;
 		private GridCell currentGridCellUnder;
-
-		public static readonly float SIZE = 1;
-		public static float FOLD_DURATION = .25f;
-		protected const float PLACE_SPEED = 15;
-		protected const float DESTROY_DURATION = .25f;
-		protected const string SEPARATOR_TAG = "Separator";
-
-		private const float SQUASH_AMOUNT = .15f;
-		private const float SQUASH_MOVE_AMOUNT = .2f;
-		private const float SQUASH_DURATION = .2f;
 
 		public static event UnityAction<ColorType, int, Vector3> OnFoldComplete; //ColorType colorType, int foldCount, Vector3 foldPosition
 
@@ -107,47 +96,27 @@ namespace GamePlay.Shapes
 				Drop(cellAbove);
 		}
 
-		public void Drop(GridCell cellToPlace)
+		public override void Drop(GridCell cellToPlace)
 		{
-			AudioManager.Instance.PlayAudio(AudioName.Pop3).SetRandomPitch(1.1f, 1.5f);
-
 			trail.emitting = true;
 
-			Coordinates = cellToPlace.Coordinates;
 			if (CurrentObstacle)
 				CurrentObstacle.Coordinates = Coordinates;
-
 			cellToPlace.CurrentShapeCell = this;
-			IsBusy = true;
-			transform.DOMove(cellToPlace.transform.position, PLACE_SPEED).SetSpeedBased().SetEase(Ease.InQuint).OnComplete(() =>
-			{
-				AudioManager.Instance.PlayAudio(AudioName.Place);
 
-				// feedbacks
-				var height = Grid.Instance.GridCells.GetLength(1);
-				for (int i = Grid.Instance.GridCells.GetLength(1) - 1; i > Coordinates.y; i--)
-				{
-					// squash
-					var shapeCellUnder = Grid.Instance.TryToGetCell(Coordinates.x, i).CurrentShapeCell;
-					shapeCellUnder.faceController.Blink(1 / (SQUASH_DURATION * 2f), SQUASH_DURATION * 2);
-					if (shapeCellUnder.IsBusy) continue;
-					shapeCellUnder.transform.DOComplete();
-					shapeCellUnder.transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - i) + shapeCellUnder.transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
-					shapeCellUnder.transform.DOScaleY(1f - SQUASH_AMOUNT, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
-				}
+			base.Drop(cellToPlace);
+		}
 
-				transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - Coordinates.y) + transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
-				transform.DOPunchScale(SQUASH_AMOUNT * Vector3.one, SQUASH_DURATION, 1).OnComplete(() =>
-				{
-					IsBusy = false;
-					// Check folding
-					if (isActiveAndEnabled && !CurrentObstacle && StateManager.Instance.CurrentState == GameState.OnStart)
-						CheckFold();
-				});
+		protected override void AfterDropping()
+		{
+			col.enabled = true;
+			trail.emitting = false;
+		}
 
-				col.enabled = true;
-				trail.emitting = false;
-			});
+		protected override void AfterSquashing()
+		{
+			if (isActiveAndEnabled && !CurrentObstacle && StateManager.Instance.CurrentState == GameState.OnStart)
+				CheckFold();
 		}
 
 		public void CheckFold()
@@ -191,6 +160,7 @@ namespace GamePlay.Shapes
 			{
 				var neighbourGridCell = Grid.Instance.GetCell(neighbourCell.Coordinates);
 				neighbourGridCell.CurrentShapeCell = null;
+				neighbourGridCell.CurrentTile = null;
 				neighbourCell.IsBusy = true;
 
 				var neighbourObstacles = Grid.Instance.GetObstacleNeighbours(neighbourGridCell);
@@ -212,14 +182,17 @@ namespace GamePlay.Shapes
 
 			// destroy neighbour cells and this cell
 			foreach (var shapeCell in neighbours)
+				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() => Destroy(shapeCell.gameObject));
+
+			transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() => Destroy(gameObject));
+			currentCell.CurrentShapeCell = null;
+			currentCell.CurrentTile = null;
+
+			// Check if plant a bomb
+			if (count + 1 >= 4)
 			{
-				currentCell.CurrentShapeCell = null;
-				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack);
-				transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() =>
-				{
-					Destroy(shapeCell.gameObject);
-					Destroy(gameObject);
-				});
+				var bomb = ObjectPooler.Instance.Spawn("Bomb", currentCell.transform.position).GetComponent<Bomb>();
+				bomb.Place(currentCell.Coordinates);
 			}
 		}
 
@@ -251,6 +224,17 @@ namespace GamePlay.Shapes
 				ObjectPooler.Instance.Release(separator, SEPARATOR_TAG);
 				IsBusy = false;
 			});
+		}
+
+		public void Blast()
+		{
+			IsBusy = false;
+			Grid.Instance.GetCell(Coordinates).CurrentTile = null;
+			Grid.Instance.GetCell(Coordinates).CurrentShapeCell = null;
+
+			OnFoldComplete?.Invoke(ColorType, 1, transform.position);
+
+			Destroy(gameObject);
 		}
 
 		public ShapeCell GetShapeCellUnder()
