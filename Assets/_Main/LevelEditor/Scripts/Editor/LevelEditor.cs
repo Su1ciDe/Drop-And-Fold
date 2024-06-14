@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Fiber.Managers;
 using Fiber.Utilities;
 using Fiber.LevelSystem;
+using Fiber.Utilities.Extensions;
 using GamePlay.Obstacles;
 using Models;
 using ScriptableObjects;
@@ -56,6 +57,15 @@ namespace LevelEditor
 		private EnumField enum_DeckColor;
 		private Button btn_AddDeckTab;
 
+		//Randomizer
+		private UnsignedIntegerField uintField_ShapeCount;
+		private VisualElement RandomizerColors_VE;
+		private MinMaxSlider minMaxSlider_CellCount;
+		private IntegerField intField_CellCountMin, intField_CellCountMax;
+		private SliderInt slider_Wood1ObstaclePercentage, slider_Wood2ObstaclePercentage;
+		private Button btn_Randomize;
+		private ListView listView_RandomizerColors;
+
 		// Options
 		private VisualElement Goal_VE;
 		private ListView listView_Goal;
@@ -96,6 +106,7 @@ namespace LevelEditor
 			LoadObstacles();
 
 			SetupElements();
+			SetupRandomizer();
 			SetupGoal();
 
 			EditorCoroutineUtility.StartCoroutine(Wait(), this);
@@ -166,7 +177,19 @@ namespace LevelEditor
 			DeckTabsRow_VE = rootVisualElement.Q<VisualElement>(nameof(DeckTabsRow_VE));
 			btn_AddDeckTab = rootVisualElement.Q<Button>(nameof(btn_AddDeckTab));
 			enum_DeckColor = rootVisualElement.Q<EnumField>(nameof(enum_DeckColor));
+			enum_DeckColor.RegisterValueChangedCallback(evt => { enum_DeckColor.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)evt.newValue].Material.color; });
+
 			btn_AddDeckTab.clickable.clicked += AddDeckTab;
+
+			// Randomizer
+			uintField_ShapeCount = rootVisualElement.Q<UnsignedIntegerField>(nameof(uintField_ShapeCount));
+			RandomizerColors_VE = rootVisualElement.Q<VisualElement>(nameof(RandomizerColors_VE));
+			minMaxSlider_CellCount = rootVisualElement.Q<MinMaxSlider>(nameof(minMaxSlider_CellCount));
+			intField_CellCountMin = rootVisualElement.Q<IntegerField>(nameof(intField_CellCountMin));
+			intField_CellCountMax = rootVisualElement.Q<IntegerField>(nameof(intField_CellCountMax));
+			slider_Wood1ObstaclePercentage = rootVisualElement.Q<SliderInt>(nameof(slider_Wood1ObstaclePercentage));
+			slider_Wood2ObstaclePercentage = rootVisualElement.Q<SliderInt>(nameof(slider_Wood2ObstaclePercentage));
+			btn_Randomize = rootVisualElement.Q<Button>(nameof(btn_Randomize));
 
 			// Options
 			Goal_VE = rootVisualElement.Q<VisualElement>(nameof(Goal_VE));
@@ -426,7 +449,11 @@ namespace LevelEditor
 			deckTabs.Add(tab);
 
 			button.clickable.clicked += () => SelectTab(button, DeckTabsRow_VE, deckTabs);
-			closeButton.clickable.clicked += () => CloseTab(button, DeckTabsRow_VE, ref deckTabs, tabName);
+			closeButton.clickable.clicked += () =>
+			{
+				CloseTab(button, DeckTabsRow_VE, ref deckTabs, tabName);
+				deckCells.RemoveAt(tabCount);
+			};
 
 			if (hasDeckSetup)
 				AddDeckGrid(deckTabs.Count - 1);
@@ -470,18 +497,12 @@ namespace LevelEditor
 		private void OnGridCellClicked(IMouseEvent e, CellInfo cellInfo)
 		{
 			if (cellInfo.Button is null) return;
-			if ((ColorType)enum_GridColor.value == ColorType.None)
+			if (selectedObstacle)
 			{
-				if (selectedObstacle)
-				{
-					cellInfo.Obstacle = selectedObstacle;
-					cellInfo.Button.text = selectedObstacle.name;
-					cellInfo.Button.style.borderBottomColor = cellInfo.Button.style.borderTopColor = cellInfo.Button.style.borderLeftColor = cellInfo.Button.style.borderRightColor = Color.black;
-					cellInfo.Button.style.borderBottomWidth = cellInfo.Button.style.borderTopWidth = cellInfo.Button.style.borderLeftWidth = cellInfo.Button.style.borderRightWidth = 5;
-				}
+				PlaceGridObstacle(cellInfo, selectedObstacle);
 			}
 
-			if (e.button.Equals(0) && !selectedObstacle) // Left click - Place
+			if (e.button.Equals(0) && (ColorType)enum_GridColor.value != ColorType.None && !selectedObstacle) // Left click - Place
 			{
 				cellInfo.ColorType = (ColorType)enum_GridColor.value;
 				cellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_GridColor.value].Material.color;
@@ -500,13 +521,20 @@ namespace LevelEditor
 			}
 		}
 
+		private void PlaceGridObstacle(CellInfo cellInfo, BaseObstacle obstacle)
+		{
+			cellInfo.Obstacle = obstacle;
+			cellInfo.Button.text = obstacle.name;
+			cellInfo.Button.style.borderBottomColor = cellInfo.Button.style.borderTopColor = cellInfo.Button.style.borderLeftColor = cellInfo.Button.style.borderRightColor = Color.black;
+			cellInfo.Button.style.borderBottomWidth = cellInfo.Button.style.borderTopWidth = cellInfo.Button.style.borderLeftWidth = cellInfo.Button.style.borderRightWidth = 5;
+		}
+
 		#endregion
 
 		#region Deck Grid
 
 		private bool hasDeckSetup = false;
 		private List<DeckCellInfo[,]> deckCells = new List<DeckCellInfo[,]>();
-		private Dictionary<string, List<Vector2Int>> shapePairs = new Dictionary<string, List<Vector2Int>>();
 		private readonly Vector2Int deckSize = new Vector2Int(4, 4);
 
 		private void SetupDeckGrid()
@@ -555,25 +583,14 @@ namespace LevelEditor
 
 		private void OnClickedDeckGrid(MouseDownEvent e, DeckCellInfo deckCellInfo)
 		{
-			if ((ColorType)enum_GridColor.value == ColorType.None)
+			if (selectedObstacle)
 			{
-				if (selectedObstacle)
-				{
-					deckCellInfo.Obstacle = selectedObstacle;
-					deckCellInfo.Button.text = selectedObstacle.name;
-					deckCellInfo.Button.style.borderBottomColor =
-						deckCellInfo.Button.style.borderTopColor = deckCellInfo.Button.style.borderLeftColor = deckCellInfo.Button.style.borderRightColor = Color.black;
-					deckCellInfo.Button.style.borderBottomWidth = deckCellInfo.Button.style.borderTopWidth = deckCellInfo.Button.style.borderLeftWidth = deckCellInfo.Button.style.borderRightWidth = 5;
-				}
+				PlaceObstacleToDeckCell(deckCellInfo, selectedObstacle);
 			}
 
-			if (e.button.Equals(0) && !selectedObstacle) // Left click - Place
+			if (e.button.Equals(0) && (ColorType)enum_GridColor.value != ColorType.None && !selectedObstacle) // Left click - Place
 			{
-				deckCellInfo.ColorType = (ColorType)enum_DeckColor.value;
-				deckCellInfo.Color = colorDataSO.ColorDatas[(ColorType)enum_DeckColor.value].Material.color;
-				deckCellInfo.Button.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)enum_DeckColor.value].Material.color;
-				deckCellInfo.Obstacle = null;
-				deckCellInfo.Button.style.borderBottomWidth = deckCellInfo.Button.style.borderTopWidth = deckCellInfo.Button.style.borderLeftWidth = deckCellInfo.Button.style.borderRightWidth = 0;
+				PlaceDeckCell(deckCellInfo, (ColorType)enum_DeckColor.value);
 			}
 
 			if (e.button.Equals(1)) // Right click - Delete
@@ -584,6 +601,200 @@ namespace LevelEditor
 
 				deckCellInfo.Button.text = "";
 				deckCellInfo.Button.style.borderBottomWidth = deckCellInfo.Button.style.borderTopWidth = deckCellInfo.Button.style.borderLeftWidth = deckCellInfo.Button.style.borderRightWidth = 0;
+			}
+		}
+
+		private void PlaceDeckCell(DeckCellInfo deckCellInfo, ColorType colorType)
+		{
+			var data = colorDataSO.ColorDatas[colorType];
+			deckCellInfo.ColorType = colorType;
+			deckCellInfo.Color = data.Material.color;
+			deckCellInfo.Button.style.backgroundColor = data.Material.color;
+			deckCellInfo.Obstacle = null;
+			deckCellInfo.Button.style.borderBottomWidth = deckCellInfo.Button.style.borderTopWidth = deckCellInfo.Button.style.borderLeftWidth = deckCellInfo.Button.style.borderRightWidth = 0;
+		}
+
+		private void PlaceObstacleToDeckCell(DeckCellInfo deckCellInfo, BaseObstacle obstacle)
+		{
+			deckCellInfo.Obstacle = obstacle;
+			deckCellInfo.Button.text = obstacle.name;
+			deckCellInfo.Button.style.borderBottomColor =
+				deckCellInfo.Button.style.borderTopColor = deckCellInfo.Button.style.borderLeftColor = deckCellInfo.Button.style.borderRightColor = Color.black;
+			deckCellInfo.Button.style.borderBottomWidth = deckCellInfo.Button.style.borderTopWidth = deckCellInfo.Button.style.borderLeftWidth = deckCellInfo.Button.style.borderRightWidth = 5;
+		}
+
+		private DeckCellInfo TryGetDeckCell(int index, int x, int y)
+		{
+			if (x >= 0 && x < deckCells[index].GetLength(0) && y >= 0 && y < deckCells[index].GetLength(1))
+				return deckCells[index][x, y];
+			return null;
+		}
+
+		#endregion
+
+		#region Randomizer
+
+		private readonly List<RandomizerColorData> randomizerColors = new List<RandomizerColorData>();
+
+		private void SetupRandomizer()
+		{
+			// Randomizer Colors
+			listView_RandomizerColors = new ListView(randomizerColors)
+			{
+				headerTitle = "Colors",
+				showFoldoutHeader = true,
+				virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+				showBoundCollectionSize = true,
+				reorderable = false,
+				showAddRemoveFooter = true,
+				makeItem = () =>
+				{
+					var randomizerColorDataVisualElement = new RandomizerColorDataVisualElement();
+					var enumColor = randomizerColorDataVisualElement.Q<EnumField>("enum_RandomizerColor");
+					int j = 0;
+					if (enumColor.userData is not null)
+					{
+						j = (int)enumColor.userData;
+						enumColor.value = randomizerColors[j].ColorType;
+					}
+
+					var amount = randomizerColorDataVisualElement.Q<SliderInt>("slider_RandomizerColorPercentage");
+					int i = 0;
+					if (amount.userData is not null)
+					{
+						i = (int)amount.userData;
+						amount.value = randomizerColors[i].Percentage;
+					}
+
+					enumColor.RegisterValueChangedCallback(evt =>
+					{
+						amount.style.backgroundColor = enumColor.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)evt.newValue].Material.color;
+
+						randomizerColors[(int)enumColor.userData].ColorType = (ColorType)evt.newValue;
+					});
+					amount.RegisterValueChangedCallback(evt => randomizerColors[(int)amount.userData].Percentage = evt.newValue);
+
+					return randomizerColorDataVisualElement;
+				},
+				bindItem = (e, i) =>
+				{
+					randomizerColors[i] ??= new RandomizerColorData();
+
+					var enumColor = e.Q<EnumField>("enum_RandomizerColor");
+					var percentage = e.Q<SliderInt>("slider_RandomizerColorPercentage");
+					percentage.userData = i;
+					enumColor.userData = i;
+					percentage.value = randomizerColors[i].Percentage;
+					enumColor.value = randomizerColors[i].ColorType;
+
+					e.RegisterCallback<ChangeEvent<Goal>>(value => goals[i] = value.newValue);
+				},
+			};
+
+			RandomizerColors_VE.Add(listView_RandomizerColors);
+
+			// MinMax Cell Count
+			minMaxSlider_CellCount.RegisterValueChangedCallback(evt =>
+			{
+				intField_CellCountMin.value = Mathf.RoundToInt(evt.newValue.x);
+				intField_CellCountMax.value = Mathf.RoundToInt(evt.newValue.y);
+			});
+			intField_CellCountMin.RegisterValueChangedCallback(evt =>
+			{
+				var value = Mathf.Clamp(evt.newValue, minMaxSlider_CellCount.lowLimit, minMaxSlider_CellCount.highLimit);
+				intField_CellCountMin.value = (int)value;
+				minMaxSlider_CellCount.minValue = value;
+			});
+			intField_CellCountMax.RegisterValueChangedCallback(evt =>
+			{
+				var value = Mathf.Clamp(evt.newValue, minMaxSlider_CellCount.lowLimit, minMaxSlider_CellCount.highLimit);
+				intField_CellCountMax.value = (int)value;
+				minMaxSlider_CellCount.maxValue = value;
+			});
+			intField_CellCountMin.value = Mathf.RoundToInt(minMaxSlider_CellCount.value.x);
+			intField_CellCountMax.value = Mathf.RoundToInt(minMaxSlider_CellCount.value.y);
+
+			// Button
+			btn_Randomize.clickable.clicked += Randomize;
+		}
+
+		private void Randomize()
+		{
+			const int maxTry = 10;
+			if (randomizerColors.Count.Equals(0)) return;
+			var colors = randomizerColors.Select(x => x.ColorType).ToList();
+			var colorWeights = randomizerColors.Select(x => x.Percentage).ToList();
+
+			foreach (var deckTab in deckTabs)
+				deckTab.VisualElement.Clear();
+			Deck_VE.Clear();
+			DeckTabsRow_VE.Clear();
+
+			deckTabs = new List<Tab>();
+			SetupDeckGrid();
+
+			for (int i = 0; i < uintField_ShapeCount.value; i++)
+			{
+				AddDeckTab();
+				var randomCellCount = Random.Range((int)minMaxSlider_CellCount.value.x, (int)minMaxSlider_CellCount.value.y + 1);
+				var currentCell = Random.Range(0, 2) == 0 ? deckCells[i][0, 0] : deckCells[i][deckCells[i].GetLength(0) - 1, 0];
+				var previousCell = currentCell;
+				var currentColor = colors.WeightedRandom(colorWeights);
+				var previousColor = ColorType.None;
+
+				for (int j = 0; j < randomCellCount; j++)
+				{
+					PlaceDeckCell(currentCell, currentColor);
+
+					if (!slider_Wood1ObstaclePercentage.value.Equals(0))
+					{
+						var r = Random.Range(1, 101);
+						if (r <= slider_Wood1ObstaclePercentage.value)
+						{
+							if (!currentCell.Obstacle)
+							{
+								// Wood 1 obstacle is at index 1
+								PlaceObstacleToDeckCell(currentCell, obstacles[1]);
+							}
+						}
+					}
+
+					if (!slider_Wood2ObstaclePercentage.value.Equals(0))
+					{
+						var r = Random.Range(1, 101);
+						if (r <= slider_Wood2ObstaclePercentage.value)
+						{
+							if (!currentCell.Obstacle)
+							{
+								// Wood 2 obstacle is at index 2
+								PlaceObstacleToDeckCell(currentCell, obstacles[2]);
+							}
+						}
+					}
+
+					previousColor = currentColor;
+					do
+					{
+						currentColor = colors.WeightedRandom(colorWeights);
+					} while (currentColor == previousColor);
+
+					previousCell = currentCell;
+					int tryCount = 0;
+					do
+					{
+						tryCount++;
+						if (tryCount > maxTry) break;
+
+						var randomDirection = Directions.AllDirections[Random.Range(0, Directions.AllDirections.Length)];
+						var newCoor = currentCell.Coordinates + randomDirection;
+						var newCell = TryGetDeckCell(i, newCoor.x, newCoor.y);
+						if (newCell is null) continue;
+						if (newCell.ColorType != ColorType.None) continue;
+						currentCell = newCell;
+					} while (currentCell == previousCell);
+
+					if (tryCount > maxTry) break;
+				}
 			}
 		}
 
@@ -679,14 +890,28 @@ namespace LevelEditor
 					cell.ColorType = levelCell.CurrentShapeCell.ColorType;
 					cell.Color = colorDataSO.ColorDatas[cell.ColorType].Material.color;
 					cell.Button.style.backgroundColor = cell.Color;
+
+					if (levelCell.CurrentShapeCell.CurrentObstacle)
+					{
+						var obstaclePrefab = PrefabUtility.GetNearestPrefabInstanceRoot(levelCell.CurrentShapeCell.CurrentObstacle).GetComponent<BaseObstacle>();
+						PlaceGridObstacle(cell, obstaclePrefab);
+					}
 				}
 			}
+
+			foreach (var deckTab in deckTabs)
+				deckTab.VisualElement.Clear();
+			Deck_VE.Clear();
+			DeckTabsRow_VE.Clear();
+
+			deckTabs = new List<Tab>();
+			deckCells = new List<DeckCellInfo[,]>();
+			SetupDeckGrid();
 
 			var levelDecks = loadedLevel.Deck.Shapes;
 			for (int i = 0; i < levelDecks.Count; i++)
 			{
-				if (!i.Equals(0))
-					AddDeckTab();
+				AddDeckTab();
 
 				foreach (var levelShapeCell in levelDecks[i].ShapeCells)
 				{
@@ -695,6 +920,12 @@ namespace LevelEditor
 					cell.Coordinates = levelShapeCell.ShapeCoordinates;
 					cell.Color = colorDataSO.ColorDatas[levelShapeCell.ColorType].Material.color;
 					cell.Button.style.backgroundColor = cell.Color;
+
+					if (levelShapeCell.CurrentObstacle)
+					{
+						var obstaclePrefab = PrefabUtility.GetNearestPrefabInstanceRoot(levelShapeCell.CurrentObstacle).GetComponent<BaseObstacle>();
+						PlaceObstacleToDeckCell(cell, obstaclePrefab);
+					}
 				}
 			}
 

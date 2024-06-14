@@ -34,15 +34,21 @@ namespace GamePlay.Shapes
 		[SerializeField] private Collider col;
 		[Space]
 		[SerializeField] private TrailRenderer trail;
+		[Space]
+		[SerializeField] private FaceController faceController;
 
 		private ShapeCell currentShapeCellUnder;
 		private GridCell currentGridCellUnder;
 
 		public static readonly float SIZE = 1;
-		protected const float PLACE_SPEED = 15;
 		public static float FOLD_DURATION = .25f;
+		protected const float PLACE_SPEED = 15;
 		protected const float DESTROY_DURATION = .25f;
 		protected const string SEPARATOR_TAG = "Separator";
+
+		private const float SQUASH_AMOUNT = .15f;
+		private const float SQUASH_MOVE_AMOUNT = .2f;
+		private const float SQUASH_DURATION = .2f;
 
 		public static event UnityAction<ColorType, int, Vector3> OnFoldComplete; //ColorType colorType, int foldCount, Vector3 foldPosition
 
@@ -117,13 +123,29 @@ namespace GamePlay.Shapes
 			{
 				AudioManager.Instance.PlayAudio(AudioName.Place);
 
-				transform.DOPunchScale(0.25f * Vector3.one, .2f, 1);
-				// Check folding
-				if (isActiveAndEnabled && !CurrentObstacle && StateManager.Instance.CurrentState == GameState.OnStart)
-					CheckFold();
+				// feedbacks
+				var height = Grid.Instance.GridCells.GetLength(1);
+				for (int i = Grid.Instance.GridCells.GetLength(1) - 1; i > Coordinates.y; i--)
+				{
+					// squash
+					var shapeCellUnder = Grid.Instance.TryToGetCell(Coordinates.x, i).CurrentShapeCell;
+					shapeCellUnder.faceController.Blink(1 / (SQUASH_DURATION * 2f), SQUASH_DURATION * 2);
+					if (shapeCellUnder.IsBusy) continue;
+					shapeCellUnder.transform.DOComplete();
+					shapeCellUnder.transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - i) + shapeCellUnder.transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+					shapeCellUnder.transform.DOScaleY(1f - SQUASH_AMOUNT, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+				}
+
+				transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - Coordinates.y) + transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+				transform.DOPunchScale(SQUASH_AMOUNT * Vector3.one, SQUASH_DURATION, 1).OnComplete(() =>
+				{
+					IsBusy = false;
+					// Check folding
+					if (isActiveAndEnabled && !CurrentObstacle && StateManager.Instance.CurrentState == GameState.OnStart)
+						CheckFold();
+				});
 
 				col.enabled = true;
-				IsBusy = false;
 				trail.emitting = false;
 			});
 		}
@@ -139,7 +161,7 @@ namespace GamePlay.Shapes
 			var currentCell = Grid.Instance.GetCell(Coordinates);
 
 			var neighbours = Grid.Instance.GetSameNeighbours(currentCell);
-			var tempNeighbours = neighbours;
+			var tempNeighbours = new List<ShapeCell>(neighbours);
 			yield return new WaitUntil(() => !tempNeighbours.Any(x => x.IsBusy));
 			IsBusy = true;
 			yield return null;
@@ -192,8 +214,8 @@ namespace GamePlay.Shapes
 			foreach (var shapeCell in neighbours)
 			{
 				currentCell.CurrentShapeCell = null;
-				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.OutBack);
-				transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.OutBack).OnComplete(() =>
+				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack);
+				transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() =>
 				{
 					Destroy(shapeCell.gameObject);
 					Destroy(gameObject);

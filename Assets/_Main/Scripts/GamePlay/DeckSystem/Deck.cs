@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
-using Fiber.LevelSystem;
 using Fiber.Managers;
+using Fiber.LevelSystem;
 using Fiber.Utilities;
 using Fiber.Utilities.Extensions;
 using GamePlay.Obstacles;
