@@ -909,7 +909,8 @@ namespace LevelEditor
 
 					if (levelCell.CurrentShapeCell.CurrentObstacle)
 					{
-						var obstaclePrefab = PrefabUtility.GetNearestPrefabInstanceRoot(levelCell.CurrentShapeCell.CurrentObstacle).GetComponent<BaseObstacle>();
+						var path = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(levelCell.CurrentShapeCell.CurrentObstacle);
+						var obstaclePrefab = AssetDatabase.LoadAssetAtPath<BaseObstacle>(path);
 						PlaceGridObstacle(cell, obstaclePrefab);
 					}
 				}
@@ -939,7 +940,8 @@ namespace LevelEditor
 
 					if (levelShapeCell.CurrentObstacle)
 					{
-						var obstaclePrefab = PrefabUtility.GetNearestPrefabInstanceRoot(levelShapeCell.CurrentObstacle).GetComponent<BaseObstacle>();
+						var path = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(levelShapeCell.CurrentObstacle);
+						var obstaclePrefab = AssetDatabase.LoadAssetAtPath<BaseObstacle>(path);
 						PlaceObstacleToDeckCell(cell, obstaclePrefab);
 					}
 				}

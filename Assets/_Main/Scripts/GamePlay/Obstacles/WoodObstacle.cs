@@ -48,6 +48,8 @@ namespace GamePlay.Obstacles
 				ParticlePooler.Instance.Spawn(PARTICLE_TAG, transform.position);
 			}
 
+			if (currentDestroyCount <= 0) return;
+
 			for (var i = 0; i < fractures.Count; i++)
 			{
 				var fracture = fractures[i];
