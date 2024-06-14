@@ -453,6 +453,17 @@ namespace LevelEditor
 			{
 				CloseTab(button, DeckTabsRow_VE, ref deckTabs, tabName);
 				deckCells.RemoveAt(tabCount);
+
+				for (var i = 0; i < deckCells.Count; i++)
+				{
+					for (int y = 0; y < deckCells[i].GetLength(1); y++)
+					{
+						for (int x = 0; x < deckCells[i].GetLength(0); x++)
+						{
+							deckCells[i][x, y].Button.userData = i;
+						}
+					}
+				}
 			};
 
 			if (hasDeckSetup)
@@ -566,6 +577,7 @@ namespace LevelEditor
 					button.focusable = false;
 
 					deckCells[tabIndex][x, y].Button = button;
+					deckCells[tabIndex][x, y].Button.userData = tabIndex;
 					deckCells[tabIndex][x, y].Coordinates = new Vector2Int(x, y);
 					deckCells[tabIndex][x, y].Color = Color.white;
 					deckCells[tabIndex][x, y].ColorType = ColorType.None;
@@ -574,15 +586,16 @@ namespace LevelEditor
 					int x1 = x;
 					int y1 = y;
 
-					button.RegisterCallback<MouseDownEvent>(e => OnClickedDeckGrid(e, deckCells[_tabIndex][x1, y1]), TrickleDown.TrickleDown);
+					button.RegisterCallback<MouseDownEvent>(e => OnClickedDeckGrid(e, button, x1, y1), TrickleDown.TrickleDown);
 
 					row.Add(button);
 				}
 			}
 		}
 
-		private void OnClickedDeckGrid(MouseDownEvent e, DeckCellInfo deckCellInfo)
+		private void OnClickedDeckGrid(MouseDownEvent e, VisualElement button, int x, int y)
 		{
+			var deckCellInfo = deckCells[(int)button.userData][x, y];
 			if (selectedObstacle)
 			{
 				PlaceObstacleToDeckCell(deckCellInfo, selectedObstacle);
