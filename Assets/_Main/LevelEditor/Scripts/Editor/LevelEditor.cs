@@ -177,6 +177,8 @@ namespace LevelEditor
 			DeckTabsRow_VE = rootVisualElement.Q<VisualElement>(nameof(DeckTabsRow_VE));
 			btn_AddDeckTab = rootVisualElement.Q<Button>(nameof(btn_AddDeckTab));
 			enum_DeckColor = rootVisualElement.Q<EnumField>(nameof(enum_DeckColor));
+			enum_DeckColor.RegisterValueChangedCallback(evt => { enum_DeckColor.style.backgroundColor = colorDataSO.ColorDatas[(ColorType)evt.newValue].Material.color; });
+
 			btn_AddDeckTab.clickable.clicked += AddDeckTab;
 
 			// Randomizer
@@ -447,7 +449,11 @@ namespace LevelEditor
 			deckTabs.Add(tab);
 
 			button.clickable.clicked += () => SelectTab(button, DeckTabsRow_VE, deckTabs);
-			closeButton.clickable.clicked += () => CloseTab(button, DeckTabsRow_VE, ref deckTabs, tabName);
+			closeButton.clickable.clicked += () =>
+			{
+				CloseTab(button, DeckTabsRow_VE, ref deckTabs, tabName);
+				deckCells.RemoveAt(tabCount);
+			};
 
 			if (hasDeckSetup)
 				AddDeckGrid(deckTabs.Count - 1);
@@ -529,7 +535,6 @@ namespace LevelEditor
 
 		private bool hasDeckSetup = false;
 		private List<DeckCellInfo[,]> deckCells = new List<DeckCellInfo[,]>();
-		private Dictionary<string, List<Vector2Int>> shapePairs = new Dictionary<string, List<Vector2Int>>();
 		private readonly Vector2Int deckSize = new Vector2Int(4, 4);
 
 		private void SetupDeckGrid()
@@ -725,7 +730,6 @@ namespace LevelEditor
 			Deck_VE.Clear();
 			DeckTabsRow_VE.Clear();
 
-			shapePairs = new Dictionary<string, List<Vector2Int>>();
 			deckTabs = new List<Tab>();
 			SetupDeckGrid();
 
@@ -733,8 +737,7 @@ namespace LevelEditor
 			{
 				AddDeckTab();
 				var randomCellCount = Random.Range((int)minMaxSlider_CellCount.value.x, (int)minMaxSlider_CellCount.value.y + 1);
-				var randomDirection = Directions.AllDirections[Random.Range(0, Directions.AllDirections.Length)];
-				var currentCell = Random.Range(0, 2) == 0 ? deckCells[i][0, 0] : deckCells[i][3, 0];
+				var currentCell = Random.Range(0, 2) == 0 ? deckCells[i][0, 0] : deckCells[i][deckCells[i].GetLength(0) - 1, 0];
 				var previousCell = currentCell;
 				var currentColor = colors.WeightedRandom(colorWeights);
 				var previousColor = ColorType.None;
@@ -782,7 +785,7 @@ namespace LevelEditor
 						tryCount++;
 						if (tryCount > maxTry) break;
 
-						randomDirection = Directions.AllDirections[Random.Range(0, Directions.AllDirections.Length)];
+						var randomDirection = Directions.AllDirections[Random.Range(0, Directions.AllDirections.Length)];
 						var newCoor = currentCell.Coordinates + randomDirection;
 						var newCell = TryGetDeckCell(i, newCoor.x, newCoor.y);
 						if (newCell is null) continue;
@@ -896,11 +899,19 @@ namespace LevelEditor
 				}
 			}
 
+			foreach (var deckTab in deckTabs)
+				deckTab.VisualElement.Clear();
+			Deck_VE.Clear();
+			DeckTabsRow_VE.Clear();
+
+			deckTabs = new List<Tab>();
+			deckCells = new List<DeckCellInfo[,]>();
+			SetupDeckGrid();
+
 			var levelDecks = loadedLevel.Deck.Shapes;
 			for (int i = 0; i < levelDecks.Count; i++)
 			{
-				if (!i.Equals(0))
-					AddDeckTab();
+				AddDeckTab();
 
 				foreach (var levelShapeCell in levelDecks[i].ShapeCells)
 				{
