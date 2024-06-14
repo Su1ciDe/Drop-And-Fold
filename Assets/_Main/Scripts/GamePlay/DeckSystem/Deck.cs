@@ -100,12 +100,6 @@ namespace GamePlay.DeckSystem
 
 			yield return null;
 
-			// if (Bomb.IsBombActive)
-			// {
-			// 	Debug.Log(" waiting for bomb!");
-			// 	yield return new WaitUntilAction(ref GridBooster.OnBoost);
-			// }
-
 			if (LevelManager.Instance.CurrentLevel.LevelType == LevelType.MoveCount && LevelManager.Instance.CurrentLevel.LevelTypeArgument <= 0)
 			{
 				LevelManager.Instance.Lose();

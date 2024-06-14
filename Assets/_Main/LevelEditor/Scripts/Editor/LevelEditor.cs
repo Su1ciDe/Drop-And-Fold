@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Utilities;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace LevelEditor
 {
@@ -126,13 +129,13 @@ namespace LevelEditor
 				var e = Event.current;
 				enum_GridColor.value = enum_DeckColor.value = e.keyCode switch
 				{
-					KeyCode.Alpha0 => ColorType.None,
-					KeyCode.Alpha1 => ColorType.Blue,
-					KeyCode.Alpha2 => ColorType.Green,
-					KeyCode.Alpha3 => ColorType.Orange,
-					KeyCode.Alpha4 => ColorType.Pink,
-					KeyCode.Alpha5 => ColorType.Red,
-					KeyCode.Alpha6 => ColorType.Yellow,
+					KeyCode.Alpha0 or KeyCode.Keypad0 => ColorType.None,
+					KeyCode.Alpha1 or KeyCode.Keypad1 => ColorType.Blue,
+					KeyCode.Alpha2 or KeyCode.Keypad2 => ColorType.Green,
+					KeyCode.Alpha3 or KeyCode.Keypad3 => ColorType.Orange,
+					KeyCode.Alpha4 or KeyCode.Keypad4 => ColorType.Pink,
+					KeyCode.Alpha5 or KeyCode.Keypad5 => ColorType.Red,
+					KeyCode.Alpha6 or KeyCode.Keypad6 => ColorType.Yellow,
 				};
 			}
 			catch (SwitchExpressionException)

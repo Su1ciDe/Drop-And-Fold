@@ -1,7 +1,7 @@
 using System.Collections;
-using Fiber.AudioSystem;
 using Fiber.Managers;
 using Fiber.Utilities;
+using Fiber.AudioSystem;
 using UnityEngine;
 
 namespace GamePlay.GridSystem.GridBoosters
@@ -13,8 +13,6 @@ namespace GamePlay.GridSystem.GridBoosters
 		[SerializeField] private float explosionDelay = 1;
 
 		private WaitForSeconds delay;
-
-		public static bool IsBombActive;
 
 		private void Awake()
 		{
@@ -55,8 +53,6 @@ namespace GamePlay.GridSystem.GridBoosters
 
 		private IEnumerator BoostCoroutine()
 		{
-			IsBombActive = true;
-
 			IsBusy = true;
 
 			var currentCell = Grid.Instance.GetCell(Coordinates);
@@ -85,10 +81,8 @@ namespace GamePlay.GridSystem.GridBoosters
 
 			yield return new WaitForSeconds(1f);
 
-			IsBombActive = false;
 			IsBusy = false;
 			yield return StartCoroutine(Grid.Instance.Rearrange());
-			// OnBoost?.Invoke();
 		}
 	}
 }
