@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Fiber.Managers;
-using Fiber.Utilities.Extensions;
 using Managers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,20 +13,19 @@ namespace UI
 
 		private readonly List<GoalUI> goalUIs = new List<GoalUI>();
 
-		private void OnEnable()
+		private GoalManager goalManager => LevelManager.Instance.CurrentLevel.GoalManager;
+
+		private void Awake()
 		{
 			LevelManager.OnLevelLoad += OnLevelLoaded;
 			LevelManager.OnLevelUnload += OnLevelUnloaded;
 		}
 
-		private void OnDisable()
+		private void OnDestroy()
 		{
 			LevelManager.OnLevelLoad -= OnLevelLoaded;
 			LevelManager.OnLevelUnload -= OnLevelUnloaded;
-		}
 
-		private void OnDestroy()
-		{
 			if (GoalManager.Instance)
 			{
 				OnLevelUnloaded();
@@ -36,7 +34,7 @@ namespace UI
 
 		private void OnLevelLoaded()
 		{
-			foreach (var goal in GoalManager.Instance.GoalDictionary.Values)
+			foreach (var goal in goalManager.GoalDictionary.Values)
 			{
 				var goalUI = Instantiate(goalUIPrefab, goalParent.transform);
 				goalUI.Setup(goal);
@@ -51,7 +49,7 @@ namespace UI
 			foreach (var goalUI in goalUIs)
 			{
 				goalUI.OnComplete -= OnGoalUICompleted;
-				Destroy(goalUI.gameObject);
+				DestroyImmediate(goalUI.gameObject);
 			}
 
 			goalUIs.Clear();

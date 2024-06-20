@@ -2,11 +2,16 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
-using Fiber.AudioSystem;
 using Fiber.Managers;
 using Fiber.Utilities;
+using Fiber.AudioSystem;
+using Fiber.LevelSystem;
+using Fiber.Utilities.Extensions;
+using GamePlay.Obstacles;
 using GamePlay.GridSystem;
 using GamePlay.DeckSystem;
+using GamePlay.GridSystem.GridBoosters;
+using Models;
 using TriInspector;
 using UnityEngine;
 using UnityEngine.Events;
@@ -16,31 +21,40 @@ using Grid = GamePlay.GridSystem.Grid;
 namespace GamePlay.Shapes
 {
 	[SelectionBase]
-	public class ShapeCell : MonoBehaviour
+	public class ShapeCell : Tile
 	{
-		[field: Title("Properties")]
-		[field: SerializeField, ReadOnly] public ColorType ColorType { get; private set; }
-		[field: SerializeField, ReadOnly] public Vector2Int Coordinates { get; private set; }
 		[field: SerializeField, ReadOnly] public Vector2Int ShapeCoordinates { get; private set; }
-
-		public bool IsBusy { get; set; } = false;
+		[field: SerializeField, ReadOnly] public ColorType ColorType { get; private set; }
+		[field: SerializeField, ReadOnly] public BaseObstacle CurrentObstacle { get; set; }
 
 		[Title("References")]
-		[SerializeField] private MeshRenderer meshRenderer;
+		[SerializeField] private MeshRenderer[] meshRenderers;
 		[SerializeField] private Collider col;
 		[Space]
 		[SerializeField] private TrailRenderer trail;
+		[Space]
+		[SerializeField] private FaceController faceController;
+		public FaceController FaceController => faceController;
 
 		private ShapeCell currentShapeCellUnder;
 		private GridCell currentGridCellUnder;
 
-		public static readonly float SIZE = 1;
-		private const float PLACE_SPEED = 15;
-		public static float FOLD_DURATION = .25f;
-		private const float DESTROY_DURATION = .25f;
-		private const string SEPARATOR_TAG = "Separator";
-
 		public static event UnityAction<ColorType, int, Vector3> OnFoldComplete; //ColorType colorType, int foldCount, Vector3 foldPosition
+
+		private void OnEnable()
+		{
+			LevelManager.OnLevelLose += OnLevelLost;
+		}
+
+		private void OnDisable()
+		{
+			LevelManager.OnLevelLose -= OnLevelLost;
+		}
+
+		private void OnLevelLost()
+		{
+			StopAllCoroutines();
+		}
 
 		public void Place()
 		{
@@ -82,37 +96,41 @@ namespace GamePlay.Shapes
 				Drop(cellAbove);
 		}
 
-		public void Drop(GridCell cellToPlace)
+		public override void Drop(GridCell cellToPlace)
 		{
-			AudioManager.Instance.PlayAudio(AudioName.Pop3).SetRandomPitch(1.1f, 1.5f);
-
 			trail.emitting = true;
 
-			Coordinates = cellToPlace.Coordinates;
+			if (CurrentObstacle)
+				CurrentObstacle.Coordinates = Coordinates;
 			cellToPlace.CurrentShapeCell = this;
-			IsBusy = true;
-			transform.DOMove(cellToPlace.transform.position, PLACE_SPEED).SetSpeedBased().SetEase(Ease.InQuint).OnComplete(() =>
-			{
-				AudioManager.Instance.PlayAudio(AudioName.Place);
 
-				transform.DOPunchScale(0.25f * Vector3.one, .2f, 1);
-				// Check folding
-				if (isActiveAndEnabled)
-					StartCoroutine(CheckFold());
-
-				col.enabled = true;
-				IsBusy = false;
-				trail.emitting = false;
-			});
+			base.Drop(cellToPlace);
 		}
 
-		private IEnumerator CheckFold()
+		protected override void AfterDropping()
+		{
+			col.enabled = true;
+			trail.emitting = false;
+		}
+
+		protected override void AfterSquashing()
+		{
+			if (isActiveAndEnabled && !CurrentObstacle && StateManager.Instance.CurrentState == GameState.OnStart)
+				CheckFold();
+		}
+
+		public void CheckFold()
+		{
+			StartCoroutine(CheckFoldCoroutine());
+		}
+
+		private IEnumerator CheckFoldCoroutine()
 		{
 			var pos = transform.position;
 			var currentCell = Grid.Instance.GetCell(Coordinates);
 
 			var neighbours = Grid.Instance.GetSameNeighbours(currentCell);
-			var tempNeighbours = neighbours;
+			var tempNeighbours = new List<ShapeCell>(neighbours);
 			yield return new WaitUntil(() => !tempNeighbours.Any(x => x.IsBusy));
 			IsBusy = true;
 			yield return null;
@@ -137,11 +155,24 @@ namespace GamePlay.Shapes
 				yield break;
 			}
 
+			var obstacles = new List<BaseObstacle>();
 			foreach (var neighbourCell in neighbours)
 			{
 				var neighbourGridCell = Grid.Instance.GetCell(neighbourCell.Coordinates);
 				neighbourGridCell.CurrentShapeCell = null;
+				neighbourGridCell.CurrentTile = null;
 				neighbourCell.IsBusy = true;
+
+				var neighbourObstacles = Grid.Instance.GetObstacleNeighbours(neighbourGridCell);
+				foreach (var obstacle in neighbourObstacles)
+				{
+					obstacles.AddIfNotContains(obstacle);
+				}
+			}
+
+			for (var i = 0; i < obstacles.Count; i++)
+			{
+				obstacles[i].OnFold();
 			}
 
 			var count = neighbours.Count();
@@ -151,26 +182,29 @@ namespace GamePlay.Shapes
 
 			// destroy neighbour cells and this cell
 			foreach (var shapeCell in neighbours)
+				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() => Destroy(shapeCell.gameObject));
+
+			transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() => Destroy(gameObject));
+			currentCell.CurrentShapeCell = null;
+			currentCell.CurrentTile = null;
+
+			// Check if plant a bomb
+			if (count + 1 >= 4)
 			{
-				currentCell.CurrentShapeCell = null;
-				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.OutBack);
-				transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.OutBack).OnComplete(() =>
-				{
-					Destroy(shapeCell.gameObject);
-					Destroy(gameObject);
-				});
+				var bomb = ObjectPooler.Instance.Spawn("Bomb", currentCell.transform.position).GetComponent<Bomb>();
+				bomb.Place(currentCell.Coordinates);
 			}
 		}
 
-		private IEnumerator Fold(ShapeCell[] neighbours, int count)
+		public IEnumerator Fold(ShapeCell[] neighbours, int count, bool feedback = true)
 		{
 			for (int i = 0; i < count; i++)
 			{
-				yield return neighbours[i].FoldTo(transform.position, i).WaitForCompletion();
+				yield return neighbours[i].FoldTo(transform.position, i, feedback).WaitForCompletion();
 			}
 		}
 
-		private Tween FoldTo(Vector3 position, int index)
+		private Tween FoldTo(Vector3 position, int index, bool feedback = true)
 		{
 			var middlePoint = (position + transform.position) / 2f;
 			var separator = ObjectPooler.Instance.Spawn(SEPARATOR_TAG, middlePoint, Quaternion.identity);
@@ -181,12 +215,26 @@ namespace GamePlay.Shapes
 
 			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetDelay(0.1f).SetEase(Ease.Linear).OnComplete(() =>
 			{
-				AudioManager.Instance.PlayAudio(AudioName.Fold).SetPitch(1 + index * 0.2f);
-				HapticManager.Instance.PlayHaptic(0.3f, .4f, FOLD_DURATION);
+				if (feedback)
+				{
+					AudioManager.Instance.PlayAudio(AudioName.Fold).SetPitch(1 + index * 0.2f);
+					HapticManager.Instance.PlayHaptic(0.3f, .4f, FOLD_DURATION);
+				}
 
 				ObjectPooler.Instance.Release(separator, SEPARATOR_TAG);
 				IsBusy = false;
 			});
+		}
+
+		public void Blast()
+		{
+			IsBusy = false;
+			Grid.Instance.GetCell(Coordinates).CurrentTile = null;
+			Grid.Instance.GetCell(Coordinates).CurrentShapeCell = null;
+
+			OnFoldComplete?.Invoke(ColorType, 1, transform.position);
+
+			Destroy(gameObject);
 		}
 
 		public ShapeCell GetShapeCellUnder()
@@ -223,18 +271,28 @@ namespace GamePlay.Shapes
 
 		public void SetupGrid(Vector2Int coordinates, ColorType colorType)
 		{
-			Coordinates = coordinates;
 			ColorType = colorType;
-			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
+			Coordinates = coordinates;
+
 			col.enabled = true;
+
+			SetupMaterials(GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material);
 		}
 
 		public void SetupShape(ColorType colorType, Vector2Int coordinates)
 		{
 			ColorType = colorType;
-			meshRenderer.material = GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material;
 			ShapeCoordinates = coordinates;
+
 			col.enabled = false;
+
+			SetupMaterials(GameManager.Instance.ColorDataSO.ColorDatas[ColorType].Material);
+		}
+
+		public void SetupMaterials(Material material)
+		{
+			foreach (var meshRenderer in meshRenderers)
+				meshRenderer.material = material;
 		}
 
 		#endregion

@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   companyName: Fiber Games
   productName: Drop&Fold
-  productIcon: {fileID: 2800000, guid: 0049bd813b4544af79cb4fe539f26a73, type: 3}
+  productIcon: {fileID: 2800000, guid: f2a0dce7dfc71014b896cb117c22c29b, type: 3}
   version: 0.1
   iOSBundleId: com.FiberGames.DropAndFold
   teamId: 9JRFGT2VDU
   iOSBuildNo: 0
-  androidBundleId: com.fibergames.game
+  androidBundleId: com.FiberGames.DropAndFold
   androidBuildNo: 1
   facebookId: 341954448708705
   facebookClientToken: 94cacb417e942af3a3317127a47db38d

@@ -1,4 +1,5 @@
 using Fiber.Managers;
+using Fiber.Utilities;
 using UnityEngine;
 
 namespace GamePlay.Player
@@ -6,12 +7,10 @@ namespace GamePlay.Player
 	/// <summary>
 	/// /// Handle Player Specific Information Assigning,  ...
 	/// </summary>
-	public class Player : MonoBehaviour
+	public class Player : Singleton<Player>
 	{
-		private void Start()
-		{
-			// TODO
-		}
+		[SerializeField] private PlayerInputs playerInputs;
+		public PlayerInputs PlayerInputs => playerInputs;
 
 		private void OnLevelLoaded()
 		{

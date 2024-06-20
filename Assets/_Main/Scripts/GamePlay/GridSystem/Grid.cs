@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Fiber.Managers;
 using Fiber.Utilities;
+using GamePlay.Obstacles;
 using GamePlay.Shapes;
 using LevelEditor;
+using Models;
 using TriInspector;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using Utilities;
 
 namespace GamePlay.GridSystem
@@ -27,11 +30,13 @@ namespace GamePlay.GridSystem
 		[SerializeField] private float ySpacing = 0;
 		[SerializeField] private GridCell cellPrefab;
 		[SerializeField] private ShapeCell shapeCellPrefab;
-		[Title("GirdFrames")]
+		[Title("Grid Frames")]
 		[SerializeField] private GameObject gridFrameCorner_Left;
 		[SerializeField] private GameObject gridFrameCorner_Right;
 		[SerializeField] private GameObject gridFrameHorizontal;
 		[SerializeField] private GameObject gridFrameVertical;
+
+		public event UnityAction OnRearrangingFinished;
 
 		private void OnEnable()
 		{
@@ -65,40 +70,45 @@ namespace GamePlay.GridSystem
 			var height = gridCells.GetLength(1);
 
 			IsRearranging = true;
-			yield return new WaitForSeconds(ShapeCell.FOLD_DURATION + 0.01f);
+			yield return new WaitForSeconds(Tile.FOLD_DURATION + 0.01f);
 
 			for (int y = height - 1; y >= 0; y--)
 			{
 				for (int x = 0; x < width; x++)
 				{
-					var shapeCell = gridCells[x, y].CurrentShapeCell;
-					if (!shapeCell) continue;
-					yield return new WaitUntil(() => !shapeCell.IsBusy);
+					var tile = gridCells[x, y].CurrentTile;
+					if (tile is null) continue;
+					yield return new WaitUntil(() => !tile.IsBusy);
 
 					var yCoor = height;
 					GridCell cellUnder = null;
 					while (cellUnder is null)
 					{
 						yCoor--;
-						if (yCoor < 0 || yCoor.Equals(shapeCell.Coordinates.y))
+						if (yCoor < 0 || yCoor.Equals(tile.Coordinates.y))
 							break;
 
-						cellUnder = TryToGetCell(shapeCell.Coordinates.x, yCoor);
-						if (cellUnder?.CurrentShapeCell)
+						cellUnder = TryToGetCell(tile.Coordinates.x, yCoor);
+						if (cellUnder?.CurrentShapeCell || cellUnder?.CurrentTile is not null)
 						{
 							cellUnder = null;
 							continue;
 						}
 					}
 
-					if (cellUnder && !cellUnder.Coordinates.Equals(shapeCell.Coordinates))
+					if (cellUnder && !cellUnder.Coordinates.Equals(tile.Coordinates))
 					{
-						GetCell(shapeCell.Coordinates).CurrentShapeCell = null;
-						shapeCell.Drop(cellUnder);
+						GetCell(tile.Coordinates).CurrentShapeCell = null;
+						GetCell(tile.Coordinates).CurrentTile = null;
+						tile.Drop(cellUnder);
 					}
 				}
 			}
 
+			OnRearrangingFinished?.Invoke();
+			
+			
+			
 			IsRearranging = false;
 			rearrangeCoroutine = null;
 		}
@@ -127,18 +137,39 @@ namespace GamePlay.GridSystem
 
 		public IEnumerable<ShapeCell> GetSameNeighbours(GridCell currentCell)
 		{
-			// Up
-			if (currentCell.Y - 1 >= 0 && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X, currentCell.Y - 1].CurrentShapeCell?.ColorType)
-				yield return gridCells[currentCell.X, currentCell.Y - 1].CurrentShapeCell;
-			// Right
-			if (currentCell.X + 1 < GridCells.GetLength(0) && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X + 1, currentCell.Y].CurrentShapeCell?.ColorType)
-				yield return gridCells[currentCell.X + 1, currentCell.Y].CurrentShapeCell;
-			// Down
-			if (currentCell.Y + 1 < gridCells.GetLength(1) && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X, currentCell.Y + 1].CurrentShapeCell?.ColorType)
-				yield return gridCells[currentCell.X, currentCell.Y + 1].CurrentShapeCell;
-			// Left 
-			if (currentCell.X - 1 >= 0 && currentCell.CurrentShapeCell.ColorType == gridCells[currentCell.X - 1, currentCell.Y].CurrentShapeCell?.ColorType)
-				yield return gridCells[currentCell.X - 1, currentCell.Y].CurrentShapeCell;
+			for (int i = 0; i < Directions.AllDirections.Length; i++)
+			{
+				var shapeCell = TryToGetCell(currentCell.Coordinates + Directions.AllDirections[i])?.CurrentShapeCell;
+				if (shapeCell && !shapeCell.CurrentObstacle && currentCell.CurrentShapeCell.ColorType == shapeCell.ColorType)
+					yield return shapeCell;
+			}
+		}
+
+		public IEnumerable<ShapeCell> GetNeighboursDiagonal(GridCell currentCell)
+		{
+			for (int i = 0; i < Directions.AllDirections.Length; i++)
+			{
+				var shapeCell = TryToGetCell(currentCell.Coordinates + Directions.AllDirections[i])?.CurrentShapeCell;
+				if (shapeCell)
+					yield return shapeCell;
+			}
+
+			for (int i = 0; i < Directions.AllDirections.Length; i++)
+			{
+				var shapeCell = TryToGetCell(currentCell.Coordinates + Directions.AllDirections[i] + Directions.AllDirections[(i + 1) % Directions.AllDirections.Length])?.CurrentShapeCell;
+				if (shapeCell)
+					yield return shapeCell;
+			}
+		}
+
+		public IEnumerable<BaseObstacle> GetObstacleNeighbours(GridCell currentCell)
+		{
+			for (int i = 0; i < Directions.AllDirections.Length; i++)
+			{
+				var shapeCell = TryToGetCell(currentCell.Coordinates + Directions.AllDirections[i])?.CurrentShapeCell;
+				if (shapeCell && shapeCell.CurrentObstacle)
+					yield return shapeCell.CurrentObstacle;
+			}
 		}
 
 		#endregion
@@ -182,7 +213,7 @@ namespace GamePlay.GridSystem
 			{
 				for (int x = 0; x < gridCells.GetLength(0); x++)
 				{
-					if (gridCells[x, y].CurrentShapeCell && gridCells[x, y].CurrentShapeCell.IsBusy)
+					if (gridCells[x, y].CurrentTile is not null && gridCells[x, y].CurrentTile.IsBusy)
 						return true;
 				}
 			}
@@ -216,13 +247,29 @@ namespace GamePlay.GridSystem
 
 					if (cellInfo.ColorType != ColorType.None)
 					{
+						var coor = new Vector2Int(x, y);
 						var shapeCell = (ShapeCell)PrefabUtility.InstantiatePrefab(shapeCellPrefab, cell.transform);
-						shapeCell.SetupGrid(new Vector2Int(x, y), cellInfo.ColorType);
+						shapeCell.SetupGrid(coor, cellInfo.ColorType);
 						cell.CurrentShapeCell = shapeCell;
+
+						if (cellInfo.Obstacle && cellInfo.Obstacle.ObstacleType == ObstacleType.Attached)
+						{
+							var obstacle = (BaseObstacle)PrefabUtility.InstantiatePrefab(cellInfo.Obstacle, shapeCell.transform);
+							obstacle.SetupGrid(coor);
+							shapeCell.CurrentObstacle = obstacle;
+						}
+					}
+					else if (cellInfo.Obstacle && cellInfo.Obstacle.ObstacleType == ObstacleType.Independent)
+					{
 					}
 				}
 			}
 
+			SetupFrame(xOffset, yOffset, width, height);
+		}
+
+		private void SetupFrame(float xOffset, float yOffset, int width, int height)
+		{
 			var leftCornerPos = new Vector3(-(xOffset + cellSize.x / 2f), -(yOffset + cellSize.y / 2f));
 			var rightCornerPos = new Vector3((xOffset + cellSize.x / 2f), -(yOffset + cellSize.y / 2f));
 

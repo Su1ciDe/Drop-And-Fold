@@ -61,3 +61,7 @@ MonoBehaviour:
     Prefab: {fileID: 3560256668848133274, guid: cdbc534e21c8a4f70981f9a42b494938, type: 3}
     InitialSize: 25
     MaxSize: 100
+  - Tag: Bomb
+    Prefab: {fileID: 473836205146040858, guid: f3871784db126440281507c9dc4fffca, type: 3}
+    InitialSize: 5
+    MaxSize: 15

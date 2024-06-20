@@ -24,8 +24,7 @@ Material:
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_Parent: {fileID: 2100000, guid: eb21b7398bc5c4c1bbf15d8d4fd16975, type: 2}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
-  - _DETAIL_MULX2
+  m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -37,14 +36,10 @@ Material:
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs:
-    - _DetailAlbedoMap:
-        m_Texture: {fileID: 2800000, guid: 08fd72f97367e094d8e90b9e786f1f9b, type: 3}
-        m_Scale: {x: 0.25, y: 0.25}
-        m_Offset: {x: 0.5, y: 0.75}
+    m_TexEnvs: []
     m_Ints: []
     m_Floats: []
     m_Colors:
-    - _BaseColor: {r: 0.08627451, g: 0.11372549, b: 0.94509804, a: 1}
-    - _Color: {r: 0.08627451, g: 0.11372549, b: 0.94509804, a: 1}
+    - _BaseColor: {r: 0.107467085, g: 0.15294865, b: 0.990566, a: 1}
+    - _Color: {r: 0.107467085, g: 0.15294865, b: 0.990566, a: 1}
   m_BuildTextureStacks: []

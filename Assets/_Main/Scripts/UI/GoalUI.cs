@@ -38,7 +38,8 @@ namespace UI
 		private void OnFoldCompleted(ColorType colorType, int count, Vector3 pos)
 		{
 			if (goal.ColorType != ColorType.None)
-				if (goal.ColorType != colorType) return;
+				if (goal.ColorType != colorType)
+					return;
 
 			if (isActiveAndEnabled)
 				StartCoroutine(WaitGoalUpdate());
@@ -56,8 +57,6 @@ namespace UI
 
 				for (int i = 0; i < count; i++)
 				{
-					var i1 = i;
-
 					var icon = ObjectPooler.Instance.Spawn(ICON_TAG, pos).GetComponent<GoalIconUI>();
 					icon.Setup(colorType);
 					icon.transform.SetParent(UIManager.Instance.transform);
@@ -66,7 +65,7 @@ namespace UI
 						tempCurrency = currentAmount - count;
 						txtGoal.transform.DOComplete();
 						txtGoal.transform.DOPunchScale(0.9f * Vector3.one, 0.2f, 2, 0.5f);
-						ChangeGoalText(Mathf.CeilToInt(Mathf.Lerp(tempCurrentCurrency, tempCurrency, (float)i1 / (count - 1))));
+						ChangeGoalText(amount);
 
 						ObjectPooler.Instance.Release(icon.gameObject, ICON_TAG);
 						HapticManager.Instance.PlayHaptic(.5f, 0);
