@@ -45,14 +45,17 @@ namespace Models
 					// squash
 					var tileUnder = Grid.Instance.TryToGetCell(Coordinates.x, i).CurrentTile;
 
-					if (tileUnder is ShapeCell shapeCell)
-						shapeCell.FaceController.Blink(1 / (SQUASH_DURATION * 2f), SQUASH_DURATION * 2);
+					if (tileUnder is not null)
+					{
+						if (tileUnder is ShapeCell shapeCell)
+							shapeCell.FaceController.Blink(1 / (SQUASH_DURATION * 2f), SQUASH_DURATION * 2);
 
-					if (tileUnder.IsBusy) continue;
-					var tileUnderT = tileUnder.GetTransform();
-					tileUnderT.DOComplete();
-					tileUnderT.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - i) + tileUnderT.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
-					tileUnderT.DOScaleY(1f - SQUASH_AMOUNT, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+						if (tileUnder.IsBusy) continue;
+						var tileUnderT = tileUnder.GetTransform();
+						tileUnderT.DOComplete();
+						tileUnderT.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - i) + tileUnderT.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+						tileUnderT.DOScaleY(1f - SQUASH_AMOUNT, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
+					}
 				}
 
 				transform.DOMoveY(-SQUASH_MOVE_AMOUNT - SQUASH_AMOUNT * (height - Coordinates.y) + transform.position.y, SQUASH_DURATION / 2f).SetLoops(2, LoopType.Yoyo);
