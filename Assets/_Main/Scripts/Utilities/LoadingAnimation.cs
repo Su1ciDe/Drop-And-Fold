@@ -1,6 +1,7 @@
 using System.Collections;
-using Fiber.Managers;
+using DG.Tweening;
 using Fiber.UI;
+using Fiber.Managers;
 using Fiber.Utilities.Extensions;
 using GamePlay.Shapes;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace Utilities
 		[SerializeField] private LoadingShapeCell[] neighbourCells;
 
 		[Space]
+		[SerializeField] private Transform point;
 		[SerializeField] private Transform moveInPoint;
 		[SerializeField] private Transform moveOutPoint;
 
@@ -25,6 +27,7 @@ namespace Utilities
 		{
 			if (LoadingPanelController.Instance)
 			{
+				LoadingPanelController.Instance.OnLoadingStarted += OnLoadingStarted;
 				LoadingPanelController.Instance.OnLoadingFinished += OnLoadingFinished;
 			}
 		}
@@ -33,29 +36,48 @@ namespace Utilities
 		{
 			if (LoadingPanelController.Instance)
 			{
+				LoadingPanelController.Instance.OnLoadingStarted -= OnLoadingStarted;
 				LoadingPanelController.Instance.OnLoadingFinished -= OnLoadingFinished;
 			}
 
 			StopAllCoroutines();
 		}
 
+		private void OnLoadingStarted()
+		{
+			StartCoroutine(PlayAnimation());
+		}
+
 		private void OnLoadingFinished()
 		{
+			Destroy(gameObject);
 		}
 
 		private IEnumerator PlayAnimation()
 		{
 			yield return null;
 
-			var r = COLOR_TYPE.RandomItem();
-			var mat = GameManager.Instance.ColorDataSO.ColorDatas[r].Material;
-			middleCell.SetupMaterials(mat);
-
-			middleCell.Fold(neighbourCells);
-
-			for (var i = 0; i < neighbourCells.Length; i++)
+			while (isActiveAndEnabled)
 			{
-				neighbourCells[i].SetupMaterials(mat);
+				var r = COLOR_TYPE.RandomItem();
+				var mat = GameManager.Instance.ColorDataSO.ColorDatas[r].Material;
+				middleCell.SetupMaterials(mat);
+				for (var i = 0; i < neighbourCells.Length; i++)
+				{
+					neighbourCells[i].SetupMaterials(mat);
+					neighbourCells[i].gameObject.SetActive(true);
+				}
+
+				yield return cellsParent.DOMove(point.position, .25f).SetEase(Ease.OutBack).WaitForCompletion();
+				yield return middleCell.Fold(neighbourCells);
+				yield return cellsParent.DOMove(moveOutPoint.position, .25f).SetEase(Ease.InBack).WaitForCompletion();
+
+				cellsParent.position = moveInPoint.position;
+				for (var i = 0; i < neighbourCells.Length; i++)
+				{
+					neighbourCells[i].transform.SetParent(cellsParent);
+					neighbourCells[i].ResetPosition();
+				}
 			}
 		}
 	}

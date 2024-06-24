@@ -234,7 +234,7 @@ namespace GamePlay.Shapes
 			var dir = (position - transform.position).normalized;
 			var dirCrossed = Vector3.Cross(dir, Vector3.forward);
 
-			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetDelay(0.1f).SetEase(Ease.Linear).OnComplete(() =>
+			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetDelay(0.05f).SetEase(Ease.Linear).OnComplete(() =>
 			{
 				if (feedback)
 				{
