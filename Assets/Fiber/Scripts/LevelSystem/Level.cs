@@ -104,7 +104,10 @@ namespace Fiber.LevelSystem
 
 		private void OnFoldComplete(ColorType colorType, int amount, Vector3 position)
 		{
-			StartCoroutine(OnFoldCompleteCoroutine());
+			if (LevelType == LevelType.MoveCount)
+			{
+				StartCoroutine(OnFoldCompleteCoroutine());
+			}
 		}
 
 		private IEnumerator OnFoldCompleteCoroutine()
