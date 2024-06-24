@@ -13,6 +13,8 @@ namespace Fiber.UI
 		[SerializeField] private TMP_Text messageText;
 		[Space]
 		[SerializeField] private Image focus;
+		[Space]
+		[SerializeField] private GameObject dragToMove;
 
 		private Vector3 messagePosition;
 
@@ -173,6 +175,16 @@ namespace Fiber.UI
 			focus.DOKill();
 			focus.transform.localScale = Vector3.one;
 			focus.gameObject.SetActive(false);
+		}
+
+		public void ShowDragToMove()
+		{
+			dragToMove.SetActive(true);
+		}
+
+		public void HideDragToMove()
+		{
+			dragToMove.SetActive(false);
 		}
 	}
 }

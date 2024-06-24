@@ -8,5 +8,7 @@ namespace Fiber.Utilities
 		public const string HAPTICS_ENABLED = "HapticsEnabled";
 		public const string IS_SOUND_MUTED = "IsSoundMuted";
 		public const string IS_MUSIC_MUTED = "IsMusicMuted";
+
+		public const string TUTORIAL_BOMB = "Tutorial_Bomb";
 	}
 }

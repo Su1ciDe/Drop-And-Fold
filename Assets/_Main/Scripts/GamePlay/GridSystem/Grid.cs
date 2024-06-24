@@ -107,8 +107,6 @@ namespace GamePlay.GridSystem
 
 			OnRearrangingFinished?.Invoke();
 			
-			
-			
 			IsRearranging = false;
 			rearrangeCoroutine = null;
 		}

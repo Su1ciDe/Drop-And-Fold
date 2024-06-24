@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using Fiber.Managers;
 using GamePlay.Player;
-using GamePlay.DeckSystem;
 using GamePlay.Shapes;
+using GamePlay.DeckSystem;
 using Managers;
 using Utilities;
 using TriInspector;
@@ -32,7 +32,7 @@ namespace Fiber.LevelSystem
 		private int currentMoveCount;
 
 		private int currentTime;
-		private readonly WaitForSeconds waitForSecond = new WaitForSeconds(1);
+		private readonly WaitForSeconds waitTimer = new WaitForSeconds(1);
 		private Coroutine timerCoroutine;
 
 		public event UnityAction<int> OnTimerTick;
@@ -104,17 +104,24 @@ namespace Fiber.LevelSystem
 
 		private void OnFoldComplete(ColorType colorType, int amount, Vector3 position)
 		{
-			StartCoroutine(OnFoldCompleteCoroutine());
+			if (LevelType == LevelType.MoveCount)
+			{
+				StartCoroutine(OnFoldCompleteCoroutine());
+			}
 		}
 
 		private IEnumerator OnFoldCompleteCoroutine()
 		{
 			yield return null;
 
-			if (currentMoveCount <= 0)
-			{
-				LevelManager.Instance.Lose();
-			}
+			if (currentMoveCount > 0) yield break;
+
+			yield return new WaitUntil(() => Grid.Instance.IsAnyCellBusy());
+			yield return waitTimer;
+			yield return new WaitUntil(() => Grid.Instance.IsAnyCellBusy());
+			yield return null;
+			
+			LevelManager.Instance.Lose();
 		}
 
 		#endregion
@@ -146,7 +153,7 @@ namespace Fiber.LevelSystem
 
 			while (currentTime > 0)
 			{
-				yield return waitForSecond;
+				yield return waitTimer;
 
 				currentTime--;
 				OnTimerTick?.Invoke(currentTime);

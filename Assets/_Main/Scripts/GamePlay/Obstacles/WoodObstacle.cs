@@ -4,12 +4,15 @@ using Fiber.Utilities;
 using Fiber.Utilities.Extensions;
 using TriInspector;
 using UnityEngine;
+using Utilities;
+using Grid = GamePlay.GridSystem.Grid;
 
 namespace GamePlay.Obstacles
 {
 	public class WoodObstacle : BaseObstacle
 	{
 		public override ObstacleType ObstacleType { get; set; } = ObstacleType.Attached;
+		protected override GoalType goalType { get; set; } = GoalType.WoodObstacle;
 
 		[Title("Wood Obstacle")]
 		[SerializeField] private int destroyCount = 2;
@@ -27,6 +30,11 @@ namespace GamePlay.Obstacles
 			{
 				Damage(false);
 			}
+		}
+
+		private void OnDestroy()
+		{
+			transform.DOKill();
 		}
 
 		public override void OnFold()
@@ -68,10 +76,13 @@ namespace GamePlay.Obstacles
 
 		public override void RemoveObstacle()
 		{
+			var gridCell = Grid.Instance.GetCell(Coordinates);
+			if (gridCell && gridCell.CurrentShapeCell)
+			{
+				gridCell.CurrentShapeCell.CheckFold();
+			}
+			
 			base.RemoveObstacle();
-
-			//TODO: polish
-			Destroy(gameObject);
 		}
 	}
 }

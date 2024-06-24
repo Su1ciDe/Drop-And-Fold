@@ -8,8 +8,8 @@ using Fiber.AudioSystem;
 using Fiber.LevelSystem;
 using Fiber.Utilities.Extensions;
 using GamePlay.Obstacles;
-using GamePlay.GridSystem;
 using GamePlay.DeckSystem;
+using GamePlay.GridSystem;
 using GamePlay.GridSystem.GridBoosters;
 using Models;
 using TriInspector;
@@ -37,6 +37,7 @@ namespace GamePlay.Shapes
 		public FaceController FaceController => faceController;
 
 		private ShapeCell currentShapeCellUnder;
+		public ShapeCell CurrentShapeCellUnder => currentShapeCellUnder;
 		private GridCell currentGridCellUnder;
 
 		public static event UnityAction<ColorType, int, Vector3> OnFoldComplete; //ColorType colorType, int foldCount, Vector3 foldPosition
@@ -100,11 +101,12 @@ namespace GamePlay.Shapes
 		{
 			trail.emitting = true;
 
-			if (CurrentObstacle)
-				CurrentObstacle.Coordinates = Coordinates;
 			cellToPlace.CurrentShapeCell = this;
 
 			base.Drop(cellToPlace);
+
+			if (CurrentObstacle)
+				CurrentObstacle.Coordinates = Coordinates;
 		}
 
 		protected override void AfterDropping()
@@ -126,6 +128,9 @@ namespace GamePlay.Shapes
 
 		private IEnumerator CheckFoldCoroutine()
 		{
+			if (CurrentObstacle)
+				yield return new WaitUntil(() => !CurrentObstacle);
+
 			var pos = transform.position;
 			var currentCell = Grid.Instance.GetCell(Coordinates);
 
@@ -156,6 +161,12 @@ namespace GamePlay.Shapes
 			}
 
 			var obstacles = new List<BaseObstacle>();
+			var neighbourObstacles = Grid.Instance.GetObstacleNeighbours(Grid.Instance.GetCell(Coordinates));
+			foreach (var obstacle in neighbourObstacles)
+			{
+				obstacles.AddIfNotContains(obstacle);
+			}
+
 			foreach (var neighbourCell in neighbours)
 			{
 				var neighbourGridCell = Grid.Instance.GetCell(neighbourCell.Coordinates);
@@ -163,7 +174,7 @@ namespace GamePlay.Shapes
 				neighbourGridCell.CurrentTile = null;
 				neighbourCell.IsBusy = true;
 
-				var neighbourObstacles = Grid.Instance.GetObstacleNeighbours(neighbourGridCell);
+				neighbourObstacles = Grid.Instance.GetObstacleNeighbours(neighbourGridCell);
 				foreach (var obstacle in neighbourObstacles)
 				{
 					obstacles.AddIfNotContains(obstacle);
