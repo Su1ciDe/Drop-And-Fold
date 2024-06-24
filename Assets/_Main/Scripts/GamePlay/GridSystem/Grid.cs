@@ -59,26 +59,34 @@ namespace GamePlay.GridSystem
 			if (rearrangeCoroutine is not null)
 				StopCoroutine(rearrangeCoroutine);
 
-			rearrangeCoroutine = StartCoroutine(Rearrange());
+			rearrangeCoroutine = StartCoroutine(Rearrange(Tile.FOLD_DURATION * (count - 1) + 0.05F));
 		}
 
 		private Coroutine rearrangeCoroutine;
 
-		public IEnumerator Rearrange()
+		public IEnumerator Rearrange(float waitDuration)
 		{
 			var width = gridCells.GetLength(0);
 			var height = gridCells.GetLength(1);
 
+			Debug.Log("rearrange");
 			IsRearranging = true;
-			yield return new WaitForSeconds(Tile.FOLD_DURATION + 0.01f);
+			yield return new WaitForSeconds(waitDuration);
 
 			for (int y = height - 1; y >= 0; y--)
 			{
 				for (int x = 0; x < width; x++)
 				{
 					var tile = gridCells[x, y].CurrentTile;
+					if (tile is ShapeCell { ColorType: ColorType.Yellow } shapeCell)
+					{
+						// Debug.Log(shapeCell.Coordinates);
+					}
+
 					if (tile is null) continue;
+					Debug.Log("wait until: " + tile.IsBusy);
 					yield return new WaitUntil(() => !tile.IsBusy);
+					Debug.Log("wait after: " + tile.IsBusy);
 
 					var yCoor = height;
 					GridCell cellUnder = null;
@@ -106,7 +114,7 @@ namespace GamePlay.GridSystem
 			}
 
 			OnRearrangingFinished?.Invoke();
-			
+
 			IsRearranging = false;
 			rearrangeCoroutine = null;
 		}

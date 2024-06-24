@@ -68,10 +68,13 @@ namespace Managers
 			PlayerInputs.OnDrag -= Level1OnDrag;
 			PlayerInputs.OnMouseUp -= Level1OnMouseUp;
 
-			tutorialUI.HideHand();
-			tutorialUI.HideText();
-			tutorialUI.HideFocus();
-			tutorialUI.HideDragToMove();
+			if (TutorialUI.Instance)
+			{
+				tutorialUI.HideHand();
+				tutorialUI.HideText();
+				tutorialUI.HideFocus();
+				tutorialUI.HideDragToMove();
+			}
 		}
 
 		#region Level1 Tutorial
