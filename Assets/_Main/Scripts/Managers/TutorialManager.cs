@@ -164,6 +164,7 @@ namespace Managers
 				tutorialUI.HideText();
 
 				PlayerPrefs.SetInt(PlayerPrefsNames.TUTORIAL_BOMB, 1);
+				Bomb.OnSpawn -= BombTutorial;
 			}
 		}
 
