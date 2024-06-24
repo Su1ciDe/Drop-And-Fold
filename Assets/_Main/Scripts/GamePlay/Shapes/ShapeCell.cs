@@ -37,6 +37,7 @@ namespace GamePlay.Shapes
 		public FaceController FaceController => faceController;
 
 		private ShapeCell currentShapeCellUnder;
+		public ShapeCell CurrentShapeCellUnder => currentShapeCellUnder;
 		private GridCell currentGridCellUnder;
 
 		public static event UnityAction<ColorType, int, Vector3> OnFoldComplete; //ColorType colorType, int foldCount, Vector3 foldPosition

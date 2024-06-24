@@ -117,7 +117,7 @@ namespace Fiber.LevelSystem
 			if (currentMoveCount > 0) yield break;
 
 			yield return new WaitUntil(() => Grid.Instance.IsAnyCellBusy());
-			yield return null;
+			yield return waitTimer;
 			yield return new WaitUntil(() => Grid.Instance.IsAnyCellBusy());
 			yield return null;
 			

@@ -1,6 +1,7 @@
 using Fiber.Managers;
 using Fiber.Utilities;
 using GamePlay.DeckSystem;
+using Managers;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -21,6 +22,7 @@ namespace GamePlay.Player
 
 		public static event UnityAction<Vector3> OnMouseDown;
 		public static event UnityAction<Vector3> OnMouseUp;
+		public static event UnityAction<Vector3> OnDrag;
 
 		private void OnEnable()
 		{
@@ -48,14 +50,18 @@ namespace GamePlay.Player
 
 			if (Input.GetMouseButton(0))
 			{
-				OnDrag();
+				OnDrag?.Invoke(Input.mousePosition);
+				OnDragging();
 			}
 
 			if (Input.GetMouseButtonUp(0))
 			{
 				isDown = false;
-				OnMouseUp?.Invoke(Input.mousePosition);
-				OnUp();
+				if (TutorialManager.Instance && TutorialManager.Instance.Predicate)
+				{
+					OnMouseUp?.Invoke(Input.mousePosition);
+					OnUp();
+				}
 			}
 		}
 
@@ -70,7 +76,7 @@ namespace GamePlay.Player
 			inputEyeTarget.transform.position = Vector3.Lerp(inputEyeTarget.transform.position, pos + BACK_POS * Vector3.back, Time.deltaTime * DAMPING);
 		}
 
-		private void OnDrag()
+		private void OnDragging()
 		{
 			if (!Deck.Instance.CurrentShape) return;
 

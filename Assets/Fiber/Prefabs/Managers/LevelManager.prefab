@@ -81,4 +81,5 @@ MonoBehaviour:
   - {fileID: 5538619472285991061, guid: 4a53cd7e588ce0f47b15eee1b2682c51, type: 3}
   - {fileID: 4050671829489845483, guid: 15439db186f9c6d4a8b5cb3040d8ffbc, type: 3}
   - {fileID: 4230478964862979552, guid: dfad791ca54b25647b1ec53db28b941d, type: 3}
-  TutorialLevels: []
+  TutorialLevels:
+  - {fileID: 8532295669766916056, guid: 22b960e82e2e2493fb4ba7a322666954, type: 3}

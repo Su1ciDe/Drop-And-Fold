@@ -4,6 +4,7 @@ using Fiber.Utilities;
 using Fiber.Utilities.Extensions;
 using TriInspector;
 using UnityEngine;
+using Utilities;
 using Grid = GamePlay.GridSystem.Grid;
 
 namespace GamePlay.Obstacles
@@ -11,6 +12,7 @@ namespace GamePlay.Obstacles
 	public class WoodObstacle : BaseObstacle
 	{
 		public override ObstacleType ObstacleType { get; set; } = ObstacleType.Attached;
+		protected override GoalType goalType { get; set; } = GoalType.WoodObstacle;
 
 		[Title("Wood Obstacle")]
 		[SerializeField] private int destroyCount = 2;
@@ -79,9 +81,7 @@ namespace GamePlay.Obstacles
 			{
 				gridCell.CurrentShapeCell.CheckFold();
 			}
-
-			//TODO: polish
-
+			
 			base.RemoveObstacle();
 		}
 	}
