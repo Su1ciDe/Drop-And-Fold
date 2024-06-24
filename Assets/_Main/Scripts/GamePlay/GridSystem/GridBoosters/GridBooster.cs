@@ -8,7 +8,7 @@ namespace GamePlay.GridSystem.GridBoosters
 	{
 		protected abstract string poolName { get; set; }
 
-		public static  UnityAction OnBoost;
+		public static UnityAction OnBoost;
 
 		protected virtual void OnEnable()
 		{
@@ -22,10 +22,9 @@ namespace GamePlay.GridSystem.GridBoosters
 		{
 			var currentCell = Grid.Instance.GetCell(coordinates);
 			currentCell.CurrentTile = this;
-			transform.position = currentCell.transform.position;
+			transform.position = currentCell.transform.position + offset;
 			Coordinates = coordinates;
 			gameObject.SetActive(true);
-
 		}
 
 		public virtual void Boost()

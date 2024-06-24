@@ -494,11 +494,11 @@ GameObject:
   - component: {fileID: 512252864}
   - component: {fileID: 512252863}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!23 &512252863
 MeshRenderer:
@@ -558,9 +558,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 512252862}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.70710576, y: -0, z: -0, w: 0.70710784}
-  m_LocalPosition: {x: 3.8323, y: 8.2698, z: 0.02}
-  m_LocalScale: {x: 6.569773, y: 2.4496, z: 6.5012383}
+  m_LocalRotation: {x: -0.7071058, y: -0, z: -0, w: 0.7071078}
+  m_LocalPosition: {x: 3.8323, y: 8.2698, z: 1}
+  m_LocalScale: {x: 6.569773, y: 1, z: 6.501238}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2344,6 +2344,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LevelManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2171944396568542195, guid: 57581fc643bb5469a94e5ed25d7eeedd, type: 3}
+      propertyPath: Levels.Array.data[0]
+      value: 
+      objectReference: {fileID: 2463055879989846494, guid: 0733e61e2b8564d87aea63fdd3bc851a, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -4,6 +4,7 @@ using Fiber.Utilities;
 using Fiber.Utilities.Extensions;
 using TriInspector;
 using UnityEngine;
+using Grid = GamePlay.GridSystem.Grid;
 
 namespace GamePlay.Obstacles
 {
@@ -73,10 +74,15 @@ namespace GamePlay.Obstacles
 
 		public override void RemoveObstacle()
 		{
-			base.RemoveObstacle();
+			var gridCell = Grid.Instance.GetCell(Coordinates);
+			if (gridCell && gridCell.CurrentShapeCell)
+			{
+				gridCell.CurrentShapeCell.CheckFold();
+			}
 
 			//TODO: polish
-			Destroy(gameObject);
+
+			base.RemoveObstacle();
 		}
 	}
 }

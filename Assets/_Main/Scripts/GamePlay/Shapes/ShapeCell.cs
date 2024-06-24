@@ -8,8 +8,8 @@ using Fiber.AudioSystem;
 using Fiber.LevelSystem;
 using Fiber.Utilities.Extensions;
 using GamePlay.Obstacles;
-using GamePlay.GridSystem;
 using GamePlay.DeckSystem;
+using GamePlay.GridSystem;
 using GamePlay.GridSystem.GridBoosters;
 using Models;
 using TriInspector;
@@ -100,11 +100,12 @@ namespace GamePlay.Shapes
 		{
 			trail.emitting = true;
 
-			if (CurrentObstacle)
-				CurrentObstacle.Coordinates = Coordinates;
 			cellToPlace.CurrentShapeCell = this;
 
 			base.Drop(cellToPlace);
+
+			if (CurrentObstacle)
+				CurrentObstacle.Coordinates = Coordinates;
 		}
 
 		protected override void AfterDropping()
@@ -126,6 +127,9 @@ namespace GamePlay.Shapes
 
 		private IEnumerator CheckFoldCoroutine()
 		{
+			if (CurrentObstacle)
+				yield return new WaitUntil(() => !CurrentObstacle);
+
 			var pos = transform.position;
 			var currentCell = Grid.Instance.GetCell(Coordinates);
 

@@ -1,7 +1,5 @@
-using GamePlay.Shapes;
 using TriInspector;
 using UnityEngine;
-using Grid = GamePlay.GridSystem.Grid;
 
 namespace GamePlay.Obstacles
 {
@@ -27,11 +25,7 @@ namespace GamePlay.Obstacles
 
 		public virtual void RemoveObstacle()
 		{
-			var gridCell = Grid.Instance.TryToGetCell(Coordinates);
-			if (gridCell && gridCell.CurrentTile is ShapeCell shapeCell)
-			{
-				shapeCell.CheckFold();
-			}
+			Destroy(gameObject);
 		}
 	}
 }

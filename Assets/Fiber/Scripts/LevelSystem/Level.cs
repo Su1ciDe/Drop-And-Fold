@@ -119,6 +119,7 @@ namespace Fiber.LevelSystem
 			yield return new WaitUntil(() => Grid.Instance.IsAnyCellBusy());
 			yield return null;
 			yield return new WaitUntil(() => Grid.Instance.IsAnyCellBusy());
+			yield return null;
 			
 			LevelManager.Instance.Lose();
 		}
