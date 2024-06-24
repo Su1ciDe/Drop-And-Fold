@@ -4,6 +4,7 @@ using Fiber.Managers;
 using Fiber.Utilities;
 using Fiber.AudioSystem;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GamePlay.GridSystem.GridBoosters
 {
@@ -14,6 +15,8 @@ namespace GamePlay.GridSystem.GridBoosters
 		[SerializeField] private float explosionDelay = 1;
 
 		private WaitForSeconds delay;
+
+		public static event UnityAction<Bomb> OnSpawn;
 
 		private const string PARTICLE_TAG = "Bomb";
 
@@ -40,6 +43,13 @@ namespace GamePlay.GridSystem.GridBoosters
 			{
 				Grid.Instance.OnRearrangingFinished -= OnGridRearrangingFinished;
 			}
+		}
+
+		public override void Place(Vector2Int coordinates)
+		{
+			base.Place(coordinates);
+
+			OnSpawn?.Invoke(this);
 		}
 
 		private void OnGridRearrangingFinished()
