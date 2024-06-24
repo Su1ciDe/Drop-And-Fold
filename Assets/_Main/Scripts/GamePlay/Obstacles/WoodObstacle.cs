@@ -29,6 +29,11 @@ namespace GamePlay.Obstacles
 			}
 		}
 
+		private void OnDestroy()
+		{
+			transform.DOKill();
+		}
+
 		public override void OnFold()
 		{
 			Damage();

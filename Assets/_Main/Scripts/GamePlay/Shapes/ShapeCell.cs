@@ -156,6 +156,12 @@ namespace GamePlay.Shapes
 			}
 
 			var obstacles = new List<BaseObstacle>();
+			var neighbourObstacles = Grid.Instance.GetObstacleNeighbours(Grid.Instance.GetCell(Coordinates));
+			foreach (var obstacle in neighbourObstacles)
+			{
+				obstacles.AddIfNotContains(obstacle);
+			}
+
 			foreach (var neighbourCell in neighbours)
 			{
 				var neighbourGridCell = Grid.Instance.GetCell(neighbourCell.Coordinates);
@@ -163,7 +169,7 @@ namespace GamePlay.Shapes
 				neighbourGridCell.CurrentTile = null;
 				neighbourCell.IsBusy = true;
 
-				var neighbourObstacles = Grid.Instance.GetObstacleNeighbours(neighbourGridCell);
+				neighbourObstacles = Grid.Instance.GetObstacleNeighbours(neighbourGridCell);
 				foreach (var obstacle in neighbourObstacles)
 				{
 					obstacles.AddIfNotContains(obstacle);
