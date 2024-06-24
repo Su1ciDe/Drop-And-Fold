@@ -99,7 +99,7 @@ namespace GamePlay.GridSystem.GridBoosters
 			yield return new WaitForSeconds(1f);
 
 			IsBusy = false;
-			yield return StartCoroutine(Grid.Instance.Rearrange());
+			yield return StartCoroutine(Grid.Instance.Rearrange(0));
 		}
 	}
 }
