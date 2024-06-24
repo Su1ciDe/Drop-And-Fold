@@ -81,6 +81,8 @@ namespace Managers
 
 		private void Level1Tutorial()
 		{
+			isLeft = true;
+
 			tutorialUI.ShowDragToMove();
 			Predicate = false;
 
