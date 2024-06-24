@@ -13,6 +13,7 @@ namespace Models
 	{
 		[field: Title("Properties")]
 		[field: SerializeField, ReadOnly] public Vector2Int Coordinates { get; set; }
+		[SerializeField] protected Vector3 offset;
 		public bool IsBusy { get; set; }
 
 		public static readonly float SIZE = 1;
@@ -34,7 +35,7 @@ namespace Models
 			cellToPlace.CurrentTile = this;
 
 			IsBusy = true;
-			transform.DOMove(cellToPlace.transform.position, PLACE_SPEED).SetSpeedBased().SetEase(Ease.InQuint).OnComplete(() =>
+			transform.DOMove(cellToPlace.transform.position + offset, PLACE_SPEED).SetSpeedBased().SetEase(Ease.InQuint).OnComplete(() =>
 			{
 				AudioManager.Instance.PlayAudio(AudioName.Place);
 
