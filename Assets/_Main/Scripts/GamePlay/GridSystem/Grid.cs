@@ -69,7 +69,6 @@ namespace GamePlay.GridSystem
 			var width = gridCells.GetLength(0);
 			var height = gridCells.GetLength(1);
 
-			Debug.Log("rearrange");
 			IsRearranging = true;
 			yield return new WaitForSeconds(waitDuration);
 
@@ -78,15 +77,9 @@ namespace GamePlay.GridSystem
 				for (int x = 0; x < width; x++)
 				{
 					var tile = gridCells[x, y].CurrentTile;
-					if (tile is ShapeCell { ColorType: ColorType.Yellow } shapeCell)
-					{
-						// Debug.Log(shapeCell.Coordinates);
-					}
 
 					if (tile is null) continue;
-					Debug.Log("wait until: " + tile.IsBusy);
 					yield return new WaitUntil(() => !tile.IsBusy);
-					Debug.Log("wait after: " + tile.IsBusy);
 
 					var yCoor = height;
 					GridCell cellUnder = null;
@@ -106,8 +99,9 @@ namespace GamePlay.GridSystem
 
 					if (cellUnder && !cellUnder.Coordinates.Equals(tile.Coordinates))
 					{
-						GetCell(tile.Coordinates).CurrentShapeCell = null;
-						GetCell(tile.Coordinates).CurrentTile = null;
+						var cell = GetCell(tile.Coordinates);
+						cell.CurrentShapeCell = null;
+						cell.CurrentTile = null;
 						tile.Drop(cellUnder);
 					}
 				}

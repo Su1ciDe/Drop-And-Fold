@@ -17,14 +17,14 @@ namespace Models
 		public bool IsBusy { get; set; }
 
 		public static readonly float SIZE = 1;
-		public static float FOLD_DURATION = .25f;
-		protected const float PLACE_SPEED = 15;
+		public static float FOLD_DURATION = .2f;
+		protected const float DROP_SPEED = .3f;
 		protected const float DESTROY_DURATION = .25f;
 		protected const string SEPARATOR_TAG = "Separator";
 
 		protected const float SQUASH_AMOUNT = .15f;
-		protected const float SQUASH_MOVE_AMOUNT = .2f;
-		protected const float SQUASH_DURATION = .2f;
+		protected const float SQUASH_MOVE_AMOUNT = .15f;
+		protected const float SQUASH_DURATION = .15f;
 
 		public virtual void Drop(GridCell cellToPlace)
 		{
@@ -35,7 +35,7 @@ namespace Models
 			cellToPlace.CurrentTile = this;
 
 			IsBusy = true;
-			transform.DOMove(cellToPlace.transform.position + offset, PLACE_SPEED).SetSpeedBased().SetEase(Ease.InQuint).OnComplete(() =>
+			transform.DOMove(cellToPlace.transform.position + offset, DROP_SPEED).SetSpeedBased(false).SetEase(Ease.InQuint).OnComplete(() =>
 			{
 				AudioManager.Instance.PlayAudio(AudioName.Place);
 
