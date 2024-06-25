@@ -1830,10 +1830,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 759845708774964946, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2027056550652419521, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2027056550652419521, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2027056550652419521, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3237318295197878231, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0.00012207031
       objectReference: {fileID: 0}
+    - target: {fileID: 3722328789692599729, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4022895058270868757, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 33c6d32d20d7e4df2aadbdead973162c, type: 2}
     - target: {fileID: 4121965583645651481, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -1849,6 +1873,10 @@ PrefabInstance:
     - target: {fileID: 4583727958816136332, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -22.090088
+      objectReference: {fileID: 0}
+    - target: {fileID: 6339174623848636531, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6658561615365355677, guid: 8c5b5dccb5a0b49d88a0a560ce89ed8d, type: 3}
       propertyPath: m_AnchoredPosition.x
