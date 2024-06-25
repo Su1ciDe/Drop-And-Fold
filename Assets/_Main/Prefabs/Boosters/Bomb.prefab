@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Coordinates>k__BackingField: {x: 0, y: 0}
   offset: {x: 0, y: 0, z: -0.5}
-  explosionDelay: 1
+  explosionDelay: 0.75
 --- !u!1 &2970819825639260717
 GameObject:
   m_ObjectHideFlags: 0

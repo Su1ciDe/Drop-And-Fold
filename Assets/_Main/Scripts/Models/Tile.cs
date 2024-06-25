@@ -19,7 +19,7 @@ namespace Models
 		public static readonly float SIZE = 1;
 		public static float FOLD_DURATION = .2f;
 		protected const float DROP_SPEED = .3f;
-		protected const float DESTROY_DURATION = .25f;
+		protected const float DESTROY_DURATION = .2f;
 		protected const string SEPARATOR_TAG = "Separator";
 
 		protected const float SQUASH_AMOUNT = .15f;
@@ -28,8 +28,6 @@ namespace Models
 
 		public virtual void Drop(GridCell cellToPlace)
 		{
-			AudioManager.Instance.PlayAudio(AudioName.Pop3).SetRandomPitch(1.1f, 1.5f);
-
 			Coordinates = cellToPlace.Coordinates;
 
 			cellToPlace.CurrentTile = this;

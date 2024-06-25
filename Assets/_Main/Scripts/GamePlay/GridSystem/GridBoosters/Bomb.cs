@@ -96,7 +96,7 @@ namespace GamePlay.GridSystem.GridBoosters
 				}
 			}
 
-			yield return new WaitForSeconds(1f);
+			yield return new WaitForSeconds(.5f);
 
 			IsBusy = false;
 			yield return StartCoroutine(Grid.Instance.Rearrange(0));
