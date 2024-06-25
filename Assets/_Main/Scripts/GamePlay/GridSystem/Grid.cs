@@ -35,8 +35,17 @@ namespace GamePlay.GridSystem
 		[SerializeField] private GameObject gridFrameCorner_Right;
 		[SerializeField] private GameObject gridFrameHorizontal;
 		[SerializeField] private GameObject gridFrameVertical;
+		[SerializeField] private GameObject deckBackground;
 
 		public event UnityAction OnRearrangingFinished;
+
+		private void Awake()
+		{
+			//TODO: add this to level editor later
+			var bg = Instantiate(deckBackground, transform);
+			bg.transform.localPosition = new Vector3(-offset.x - Tile.SIZE / 2f, offset.y + Tile.SIZE / 2f, -0.022f);
+			bg.transform.localScale = new Vector3(gridCells.GetLength(0), 4);
+		}
 
 		private void OnEnable()
 		{

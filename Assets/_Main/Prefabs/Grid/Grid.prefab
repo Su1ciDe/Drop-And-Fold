@@ -56,3 +56,4 @@ MonoBehaviour:
   gridFrameCorner_Right: {fileID: 5649248894977043544, guid: 2133cd9c0611e4a95a8b015568808c56, type: 3}
   gridFrameHorizontal: {fileID: 5098883387698951455, guid: 6cde3b7a969e94697893a4d9bfa96f9b, type: 3}
   gridFrameVertical: {fileID: 2504377021865218720, guid: debc5b3cf43d540eba6826118a800161, type: 3}
+  deckBackground: {fileID: 6353046275720751884, guid: 27e43fba964c84742994ef20861ffeb1, type: 3}

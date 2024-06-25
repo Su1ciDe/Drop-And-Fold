@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 706024648334985288}
   - component: {fileID: 5736767596076862708}
   m_Layer: 0
-  m_Name: GridFrame_Vertical
+  m_Name: GridFrame_VerticalRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
