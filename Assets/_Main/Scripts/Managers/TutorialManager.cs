@@ -1,9 +1,10 @@
 using System.Collections;
-using Fiber.Managers;
 using Fiber.UI;
+using Fiber.Managers;
 using Fiber.Utilities;
-using GamePlay.DeckSystem;
 using GamePlay.Player;
+using GamePlay.DeckSystem;
+using GamePlay.GridSystem.GridBoosters;
 using UnityEngine;
 using Grid = GamePlay.GridSystem.Grid;
 
@@ -29,6 +30,7 @@ namespace Managers
 			LevelManager.OnLevelStart -= OnLevelStarted;
 			LevelManager.OnLevelWin -= OnLevelWon;
 			LevelManager.OnLevelUnload -= OnLevelUnloaded;
+			Bomb.OnSpawn -= BombTutorial;
 
 			Unsub();
 		}
@@ -38,6 +40,11 @@ namespace Managers
 			if (LevelManager.Instance.LevelNo.Equals(1))
 			{
 				Level1Tutorial();
+			}
+
+			if (PlayerPrefs.GetInt(PlayerPrefsNames.TUTORIAL_BOMB, 0) == 0)
+			{
+				Bomb.OnSpawn += BombTutorial;
 			}
 		}
 
@@ -61,10 +68,13 @@ namespace Managers
 			PlayerInputs.OnDrag -= Level1OnDrag;
 			PlayerInputs.OnMouseUp -= Level1OnMouseUp;
 
-			tutorialUI.HideHand();
-			tutorialUI.HideText();
-			tutorialUI.HideFocus();
-			tutorialUI.HideDragToMove();
+			if (TutorialUI.Instance)
+			{
+				tutorialUI.HideHand();
+				tutorialUI.HideText();
+				tutorialUI.HideFocus();
+				tutorialUI.HideDragToMove();
+			}
 		}
 
 		#region Level1 Tutorial
@@ -74,6 +84,8 @@ namespace Managers
 
 		private void Level1Tutorial()
 		{
+			isLeft = true;
+
 			tutorialUI.ShowDragToMove();
 			Predicate = false;
 
@@ -88,7 +100,6 @@ namespace Managers
 			PlayerInputs.OnDrag -= Level1OnDrag;
 			PlayerInputs.OnMouseUp -= Level1OnMouseUp;
 
-			//
 			moveHereIndicator.SetActive(false);
 			isLeft = !isLeft;
 
@@ -126,6 +137,35 @@ namespace Managers
 		private void Level1OnDrag(Vector3 mousePos)
 		{
 			Predicate = Deck.Instance.CurrentShape?.ShapeCells[0].ColorType == Deck.Instance.CurrentShape?.ShapeCells[0].CurrentShapeCellUnder?.ColorType;
+		}
+
+		#endregion
+
+		#region Bomb Tutorial
+
+		private void BombTutorial(Bomb bomb)
+		{
+			tutorialUI.ShowFocus(bomb.transform.position, Helper.MainCamera);
+			tutorialUI.ShowText("A Bomb Will Appear When You Fold 4!");
+
+			StartCoroutine(WaitPause());
+			return;
+
+			IEnumerator WaitPause()
+			{
+				yield return new WaitForSeconds(0.4f);
+				Time.timeScale = 0;
+
+				yield return new WaitForSecondsRealtime(2);
+
+				Time.timeScale = 1;
+
+				tutorialUI.HideFocus();
+				tutorialUI.HideText();
+
+				PlayerPrefs.SetInt(PlayerPrefsNames.TUTORIAL_BOMB, 1);
+				Bomb.OnSpawn -= BombTutorial;
+			}
 		}
 
 		#endregion

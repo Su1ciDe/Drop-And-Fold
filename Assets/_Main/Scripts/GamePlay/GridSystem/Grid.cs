@@ -35,8 +35,17 @@ namespace GamePlay.GridSystem
 		[SerializeField] private GameObject gridFrameCorner_Right;
 		[SerializeField] private GameObject gridFrameHorizontal;
 		[SerializeField] private GameObject gridFrameVertical;
+		[SerializeField] private GameObject deckBackground;
 
 		public event UnityAction OnRearrangingFinished;
+
+		private void Awake()
+		{
+			//TODO: add this to level editor later
+			var bg = Instantiate(deckBackground, transform);
+			bg.transform.localPosition = new Vector3(-offset.x - Tile.SIZE / 2f, offset.y + Tile.SIZE / 2f, -0.022f);
+			bg.transform.localScale = new Vector3(gridCells.GetLength(0), 4);
+		}
 
 		private void OnEnable()
 		{
@@ -59,24 +68,25 @@ namespace GamePlay.GridSystem
 			if (rearrangeCoroutine is not null)
 				StopCoroutine(rearrangeCoroutine);
 
-			rearrangeCoroutine = StartCoroutine(Rearrange());
+			rearrangeCoroutine = StartCoroutine(Rearrange(Tile.FOLD_DURATION * (count - 1) + 0.05F));
 		}
 
 		private Coroutine rearrangeCoroutine;
 
-		public IEnumerator Rearrange()
+		public IEnumerator Rearrange(float waitDuration)
 		{
 			var width = gridCells.GetLength(0);
 			var height = gridCells.GetLength(1);
 
 			IsRearranging = true;
-			yield return new WaitForSeconds(Tile.FOLD_DURATION + 0.01f);
+			yield return new WaitForSeconds(waitDuration);
 
 			for (int y = height - 1; y >= 0; y--)
 			{
 				for (int x = 0; x < width; x++)
 				{
 					var tile = gridCells[x, y].CurrentTile;
+
 					if (tile is null) continue;
 					yield return new WaitUntil(() => !tile.IsBusy);
 
@@ -98,15 +108,16 @@ namespace GamePlay.GridSystem
 
 					if (cellUnder && !cellUnder.Coordinates.Equals(tile.Coordinates))
 					{
-						GetCell(tile.Coordinates).CurrentShapeCell = null;
-						GetCell(tile.Coordinates).CurrentTile = null;
+						var cell = GetCell(tile.Coordinates);
+						cell.CurrentShapeCell = null;
+						cell.CurrentTile = null;
 						tile.Drop(cellUnder);
 					}
 				}
 			}
 
 			OnRearrangingFinished?.Invoke();
-			
+
 			IsRearranging = false;
 			rearrangeCoroutine = null;
 		}

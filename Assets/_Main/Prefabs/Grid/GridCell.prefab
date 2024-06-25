@@ -215,7 +215,7 @@ MonoBehaviour:
   <CurrentShapeCell>k__BackingField: {fileID: 0}
   meshRenderer: {fileID: 4961835998397267738}
   material: {fileID: 2100000, guid: 45e9c698bdca5f14cbd2bfe37484034c, type: 2}
-  highlightMaterial: {fileID: 2100000, guid: ed3cde37a479e5447a20456c4956f106, type: 2}
+  highlightMaterial: {fileID: 2100000, guid: b558dfd8f80454ffd8afd4d7593fd09f, type: 2}
 --- !u!1001 &5988219793635042206
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,16 +1,28 @@
+using System.Collections;
 using UnityEngine;
 
 namespace GamePlay.Shapes
 {
 	public class LoadingShapeCell : ShapeCell
 	{
-		public void Fold(ShapeCell[] cells)
+		private Vector3 startingPos;
+		private Quaternion startingRot;
+
+		private void Awake()
 		{
-			StartCoroutine(Fold(cells, cells.Length, false));
+			startingPos = transform.localPosition;
+			startingRot = transform.localRotation;
 		}
 
-		public void Unfold()
+		public IEnumerator Fold(ShapeCell[] cells)
 		{
+			yield return StartCoroutine(Fold(cells, cells.Length, false));
+		}
+
+		public void ResetPosition()
+		{
+			transform.localPosition = startingPos;
+			transform.localRotation = startingRot;
 		}
 	}
 }

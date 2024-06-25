@@ -35,6 +35,11 @@ namespace UI
 			ShapeCell.OnFoldComplete -= OnFoldCompleted;
 		}
 
+		private void OnDestroy()
+		{
+			txtGoal.transform.DOKill();
+		}
+
 		private void OnFoldCompleted(ColorType colorType, int count, Vector3 pos)
 		{
 			if (goal.ColorType != ColorType.None)
@@ -48,12 +53,10 @@ namespace UI
 			IEnumerator WaitGoalUpdate()
 			{
 				yield return null;
+				
 				var amount = goal.Amount - goal.CurrentAmount;
 
 				pos = Helper.MainCamera.WorldToScreenPoint(pos);
-
-				var tempCurrency = currentAmount - count;
-				var tempCurrentCurrency = currentAmount;
 
 				for (int i = 0; i < count; i++)
 				{
@@ -62,7 +65,6 @@ namespace UI
 					icon.transform.SetParent(UIManager.Instance.transform);
 					icon.transform.DOMove(transform.position, ICON_MOVE_DURATION).SetDelay(i * DELAY).SetEase(Ease.InBack).OnComplete(() =>
 					{
-						tempCurrency = currentAmount - count;
 						txtGoal.transform.DOComplete();
 						txtGoal.transform.DOPunchScale(0.9f * Vector3.one, 0.2f, 2, 0.5f);
 						ChangeGoalText(amount);

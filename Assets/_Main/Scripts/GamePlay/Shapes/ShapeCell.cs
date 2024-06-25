@@ -95,6 +95,9 @@ namespace GamePlay.Shapes
 
 			if (cellAbove)
 				Drop(cellAbove);
+
+			currentGridCellUnder = null;
+			currentShapeCellUnder = null;
 		}
 
 		public override void Drop(GridCell cellToPlace)
@@ -136,6 +139,12 @@ namespace GamePlay.Shapes
 
 			var neighbours = Grid.Instance.GetSameNeighbours(currentCell);
 			var tempNeighbours = new List<ShapeCell>(neighbours);
+			if (tempNeighbours.Count.Equals(0))
+			{
+				IsBusy = false;
+				yield break;
+			}
+
 			yield return new WaitUntil(() => !tempNeighbours.Any(x => x.IsBusy));
 			IsBusy = true;
 			yield return null;
@@ -188,6 +197,7 @@ namespace GamePlay.Shapes
 
 			var count = neighbours.Count();
 			yield return Fold((ShapeCell[])neighbours, count);
+			yield return null;
 
 			OnFoldComplete?.Invoke(ColorType, count + 1, pos);
 
@@ -224,7 +234,7 @@ namespace GamePlay.Shapes
 			var dir = (position - transform.position).normalized;
 			var dirCrossed = Vector3.Cross(dir, Vector3.forward);
 
-			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetDelay(0.1f).SetEase(Ease.Linear).OnComplete(() =>
+			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetDelay(0.05f).SetEase(Ease.Linear).OnComplete(() =>
 			{
 				if (feedback)
 				{

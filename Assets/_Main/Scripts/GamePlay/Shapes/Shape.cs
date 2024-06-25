@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Fiber.AudioSystem;
 using Fiber.Managers;
 using Fiber.Utilities.Extensions;
 using GamePlay.GridSystem;
@@ -74,6 +75,7 @@ namespace GamePlay.Shapes
 			if (touchingGridCells is null || touchingGridCells.Count <= 0) return;
 
 			HapticManager.Instance.PlayHaptic(HapticPatterns.PresetType.RigidImpact);
+			AudioManager.Instance.PlayAudio(AudioName.Pop3).SetRandomPitch(1.1f, 1.5f);
 
 			SetHighlights(false);
 			// var highestCell = FindHighestCell();

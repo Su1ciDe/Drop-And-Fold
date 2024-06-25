@@ -52,7 +52,7 @@ namespace GamePlay.Obstacles
 		{
 			if (playEffects)
 			{
-				transform.DOPunchPosition(0.075f * Vector3.one, .15f, 25);
+				transform.DOPunchPosition(0.075f * Vector3.one, .25f, 25);
 				ParticlePooler.Instance.Spawn(PARTICLE_TAG, transform.position);
 			}
 

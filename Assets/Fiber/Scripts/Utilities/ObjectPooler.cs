@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using Fiber.Managers;
 using TriInspector;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace Fiber.Utilities
 			public int CountActive => ActiveList.Count;
 			public int CountInactive => PooledObjectsQueue.Count;
 		}
-		
+
 		[TableList]
 		[SerializeField] private List<Pool> pools = new List<Pool>();
 		private Dictionary<string, Pooled> poolDictionary = new Dictionary<string, Pooled>();
@@ -52,7 +53,7 @@ namespace Fiber.Utilities
 		{
 			LevelManager.OnLevelUnload += OnLevelUnload;
 		}
-		
+
 		private void OnDisable()
 		{
 			LevelManager.OnLevelUnload -= OnLevelUnload;
@@ -69,6 +70,7 @@ namespace Fiber.Utilities
 				{
 					var go = pool.ActiveList[0];
 					go.transform.SetParent(transform);
+					go.transform.DOKill();
 					go.gameObject.SetActive(false);
 					pool.PooledObjectsQueue.Enqueue(go);
 					pool.ActiveList.RemoveAt(0);
