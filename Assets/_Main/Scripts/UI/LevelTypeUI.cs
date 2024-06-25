@@ -14,6 +14,7 @@ namespace UI
 		[Space]
 		[SerializeField] private Sprite timerSprite;
 		[SerializeField] private Sprite moveCountSprite;
+		[SerializeField] private TMP_Text lblTimer_MoveCount;
 
 		private const float TIMER_ANIM_DURATION = .25f;
 
@@ -50,12 +51,14 @@ namespace UI
 
 		private void SetupTimer()
 		{
+			lblTimer_MoveCount.SetText("TIME");
 			imgLevelType.sprite = timerSprite;
 			LevelManager.Instance.CurrentLevel.OnTimerTick += OnTimerTicked;
 		}
 
 		private void SetupMoveCount()
 		{
+			lblTimer_MoveCount.SetText("MOVE");
 			imgLevelType.sprite = moveCountSprite;
 			LevelManager.Instance.CurrentLevel.OnMoveCountChange += OnMoveCountUpdated;
 		}
