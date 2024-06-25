@@ -23,12 +23,17 @@ namespace Utilities
 
 		private const ColorType COLOR_TYPE = ColorType.None;
 
+		private void Awake()
+		{
+			DontDestroyOnLoad(gameObject);
+			OnLoadingStarted();
+		}
+
 		private void OnEnable()
 		{
 			if (LoadingPanelController.Instance)
 			{
-				LoadingPanelController.Instance.OnLoadingStarted += OnLoadingStarted;
-				LoadingPanelController.Instance.OnLoadingFinished += OnLoadingFinished;
+				LoadingPanelController.OnLoadingFinished += OnLoadingFinished;
 			}
 		}
 
@@ -36,8 +41,7 @@ namespace Utilities
 		{
 			if (LoadingPanelController.Instance)
 			{
-				LoadingPanelController.Instance.OnLoadingStarted -= OnLoadingStarted;
-				LoadingPanelController.Instance.OnLoadingFinished -= OnLoadingFinished;
+				LoadingPanelController.OnLoadingFinished -= OnLoadingFinished;
 			}
 
 			StopAllCoroutines();
@@ -55,8 +59,6 @@ namespace Utilities
 
 		private IEnumerator PlayAnimation()
 		{
-			yield return null;
-
 			while (isActiveAndEnabled)
 			{
 				var r = COLOR_TYPE.RandomItem();
@@ -68,7 +70,7 @@ namespace Utilities
 					neighbourCells[i].gameObject.SetActive(true);
 				}
 
-				yield return cellsParent.DOMove(point.position, .25f).SetEase(Ease.OutBack).WaitForCompletion();
+				yield return cellsParent.DOMove(point.position, .25f).SetEase(Ease.OutBack).SetLink(cellsParent.gameObject).WaitForCompletion();
 				yield return middleCell.Fold(neighbourCells);
 				yield return cellsParent.DOMove(moveOutPoint.position, .25f).SetEase(Ease.InBack).WaitForCompletion();
 

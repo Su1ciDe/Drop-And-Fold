@@ -5,6 +5,7 @@ using Fiber.Utilities;
 using GamePlay.Player;
 using GamePlay.DeckSystem;
 using GamePlay.GridSystem.GridBoosters;
+using GamePlay.Obstacles;
 using UnityEngine;
 using Grid = GamePlay.GridSystem.Grid;
 
@@ -18,11 +19,14 @@ namespace Managers
 
 		private TutorialUI tutorialUI => TutorialUI.Instance;
 
-		private void Awake()
+		private void Start()
 		{
-			LevelManager.OnLevelStart += OnLevelStarted;
 			LevelManager.OnLevelWin += OnLevelWon;
 			LevelManager.OnLevelUnload += OnLevelUnloaded;
+			if (LoadingPanelController.IsLoading)
+				LoadingPanelController.OnLoadingFinished += OnLevelStarted;
+			else
+				LevelManager.OnLevelStart += OnLevelStarted;
 		}
 
 		private void OnDestroy()
@@ -31,6 +35,10 @@ namespace Managers
 			LevelManager.OnLevelWin -= OnLevelWon;
 			LevelManager.OnLevelUnload -= OnLevelUnloaded;
 			Bomb.OnSpawn -= BombTutorial;
+			if (LoadingPanelController.Instance)
+			{
+				LoadingPanelController.OnLoadingFinished += OnLevelStarted;
+			}
 
 			Unsub();
 		}
@@ -42,11 +50,11 @@ namespace Managers
 				Level1Tutorial();
 			}
 
-			if (LevelManager.Instance.LevelNo.Equals(9))
+			if (LevelManager.Instance.LevelNo.Equals(10))
 			{
 				Level9Tutorial();
 			}
-			
+
 			if (PlayerPrefs.GetInt(PlayerPrefsNames.TUTORIAL_BOMB, 0) == 0)
 			{
 				Bomb.OnSpawn += BombTutorial;
@@ -72,6 +80,7 @@ namespace Managers
 
 			PlayerInputs.OnDrag -= Level1OnDrag;
 			PlayerInputs.OnMouseUp -= Level1OnMouseUp;
+			PlayerInputs.OnMouseDown -= Level9OnMouseDown;
 
 			if (TutorialUI.Instance)
 			{
@@ -150,11 +159,24 @@ namespace Managers
 
 		private void Level9Tutorial()
 		{
-			
+			tutorialUI.ShowText("Break the Wood by folding next to it!");
+
+			var obstacle = FindAnyObjectByType<WoodObstacle>();
+			tutorialUI.ShowFocus(obstacle.transform.position, Helper.MainCamera, true);
+
+			PlayerInputs.OnMouseDown += Level9OnMouseDown;
+		}
+
+		private void Level9OnMouseDown(Vector3 arg0)
+		{
+			PlayerInputs.OnMouseDown -= Level9OnMouseDown;
+
+			tutorialUI.HideText();
+			tutorialUI.HideFocus();
 		}
 
 		#endregion
-		
+
 		#region Bomb Tutorial
 
 		private void BombTutorial(Bomb bomb)
