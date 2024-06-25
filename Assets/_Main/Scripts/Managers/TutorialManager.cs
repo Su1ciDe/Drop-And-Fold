@@ -42,6 +42,11 @@ namespace Managers
 				Level1Tutorial();
 			}
 
+			if (LevelManager.Instance.LevelNo.Equals(9))
+			{
+				Level9Tutorial();
+			}
+			
 			if (PlayerPrefs.GetInt(PlayerPrefsNames.TUTORIAL_BOMB, 0) == 0)
 			{
 				Bomb.OnSpawn += BombTutorial;
@@ -141,6 +146,15 @@ namespace Managers
 
 		#endregion
 
+		#region Level 9 Tutorial
+
+		private void Level9Tutorial()
+		{
+			
+		}
+
+		#endregion
+		
 		#region Bomb Tutorial
 
 		private void BombTutorial(Bomb bomb)

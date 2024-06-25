@@ -17,7 +17,9 @@ namespace GamePlay.Obstacles
 		[Title("Wood Obstacle")]
 		[SerializeField] private int destroyCount = 2;
 		[Space]
-		[SerializeField] private List<GameObject> fractures;
+		[SerializeField] private GameObject fracture2;
+		[SerializeField] private GameObject fracture1;
+		// [SerializeField] private List<GameObject> fractures;
 
 		private int currentDestroyCount;
 
@@ -39,9 +41,9 @@ namespace GamePlay.Obstacles
 
 		public override void OnFold()
 		{
+			currentDestroyCount--;
 			Damage();
 
-			currentDestroyCount--;
 			if (currentDestroyCount <= 0)
 			{
 				RemoveObstacle();
@@ -56,22 +58,33 @@ namespace GamePlay.Obstacles
 				ParticlePooler.Instance.Spawn(PARTICLE_TAG, transform.position);
 			}
 
-			if (currentDestroyCount <= 0) return;
-
-			for (var i = 0; i < fractures.Count; i++)
+			if (currentDestroyCount.Equals(1))
 			{
-				var fracture = fractures[i];
-				var direction = fracture.transform.position - transform.position;
-				fracture.transform.localPosition += direction * Random.Range(0.01f, 0.05f);
-				fracture.transform.eulerAngles += new Vector3(Random.Range(0, 5), Random.Range(0, 5), Random.Range(0, 5));
+				fracture2.SetActive(false);
+				fracture1.SetActive(true);
+			}
+			else if (currentDestroyCount.Equals(2))
+			{
+				fracture2.SetActive(true);
+				fracture1.SetActive(false);
 			}
 
-			for (int j = 0; j < fractures.Count / currentDestroyCount; j++)
-			{
-				var fracture = fractures.PickRandomItem();
-				fracture.gameObject.SetActive(false);
-				fractures.Remove(fracture);
-			}
+			// if (currentDestroyCount <= 0) return;
+
+			// for (var i = 0; i < fractures.Count; i++)
+			// {
+			// 	var fracture = fractures[i];
+			// 	var direction = fracture.transform.position - transform.position;
+			// 	fracture.transform.localPosition += direction * Random.Range(0.01f, 0.05f);
+			// 	fracture.transform.eulerAngles += new Vector3(Random.Range(0, 5), Random.Range(0, 5), Random.Range(0, 5));
+			// }
+			//
+			// for (int j = 0; j < fractures.Count / currentDestroyCount; j++)
+			// {
+			// 	var fracture = fractures.PickRandomItem();
+			// 	fracture.gameObject.SetActive(false);
+			// 	fractures.Remove(fracture);
+			// }
 		}
 
 		public override void RemoveObstacle()
@@ -81,7 +94,7 @@ namespace GamePlay.Obstacles
 			{
 				gridCell.CurrentShapeCell.CheckFold();
 			}
-			
+
 			base.RemoveObstacle();
 		}
 	}
