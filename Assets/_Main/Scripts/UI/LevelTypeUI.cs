@@ -63,6 +63,11 @@ namespace UI
 		private void OnMoveCountUpdated(int moveCount)
 		{
 			txtTimer_MoveCount.SetText(moveCount.ToString());
+			txtTimer_MoveCount.transform.DOScale(1.5f, TIMER_ANIM_DURATION / 2f).SetEase(Ease.InOutCubic).SetLoops(2, LoopType.Yoyo);
+			if (moveCount <= 5)
+			{
+				txtTimer_MoveCount.DOColor(Color.red, TIMER_ANIM_DURATION / 2f).SetEase(Ease.InOutCubic).SetLoops(2, LoopType.Yoyo);
+			}
 		}
 
 		private void OnTimerTicked(int time)
