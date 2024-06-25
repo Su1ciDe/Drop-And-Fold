@@ -47,6 +47,11 @@ namespace Utilities
 			StopAllCoroutines();
 		}
 
+		private void OnDestroy()
+		{
+			cellsParent.DOKill();
+		}
+
 		private void OnLoadingStarted()
 		{
 			StartCoroutine(PlayAnimation());
@@ -70,7 +75,7 @@ namespace Utilities
 					neighbourCells[i].gameObject.SetActive(true);
 				}
 
-				yield return cellsParent.DOMove(point.position, .25f).SetEase(Ease.OutBack).SetLink(cellsParent.gameObject).WaitForCompletion();
+				yield return cellsParent.DOMove(point.position, .25f).SetEase(Ease.OutBack).WaitForCompletion();
 				yield return middleCell.Fold(neighbourCells);
 				yield return cellsParent.DOMove(moveOutPoint.position, .25f).SetEase(Ease.InBack).WaitForCompletion();
 

@@ -68,7 +68,7 @@ namespace GamePlay.GridSystem
 			if (rearrangeCoroutine is not null)
 				StopCoroutine(rearrangeCoroutine);
 
-			rearrangeCoroutine = StartCoroutine(Rearrange(Tile.FOLD_DURATION * (count - 1) + 0.05F));
+			rearrangeCoroutine = StartCoroutine(Rearrange(Tile.FOLD_DURATION));
 		}
 
 		private Coroutine rearrangeCoroutine;
@@ -80,6 +80,7 @@ namespace GamePlay.GridSystem
 
 			IsRearranging = true;
 			yield return new WaitForSeconds(waitDuration);
+			yield return null;
 
 			for (int y = height - 1; y >= 0; y--)
 			{
