@@ -98,15 +98,15 @@ namespace Managers
 
 		private void Level1Tutorial()
 		{
-			isLeft = true;
+			// isLeft = true;
 
 			tutorialUI.ShowDragToMove();
-			Predicate = false;
-
-			ShowMoveHere(GetLeftOrRight());
-
-			PlayerInputs.OnDrag += Level1OnDrag;
-			PlayerInputs.OnMouseUp += Level1OnMouseUp;
+			// Predicate = false;
+			//
+			// ShowMoveHere(GetLeftOrRight());
+			//
+			// PlayerInputs.OnDrag += Level1OnDrag;
+			// PlayerInputs.OnMouseUp += Level1OnMouseUp;
 		}
 
 		private void Level1OnMouseUp(Vector3 mousePos)
@@ -145,12 +145,15 @@ namespace Managers
 
 		private float GetLeftOrRight()
 		{
-			return isLeft ? Grid.Instance.GridCells[0, 0].transform.position.x : Grid.Instance.GridCells[Grid.Instance.GridCells.GetLength(0) - 1, 0].transform.position.x;
+			return isLeft
+				? Grid.Instance.GridCells[0, 0].transform.position.x
+				: Grid.Instance.GridCells[Grid.Instance.GridCells.GetLength(0) - 1, 0].transform.position.x;
 		}
 
 		private void Level1OnDrag(Vector3 mousePos)
 		{
-			Predicate = Deck.Instance.CurrentShape?.ShapeCells[0].ColorType == Deck.Instance.CurrentShape?.ShapeCells[0].CurrentShapeCellUnder?.ColorType;
+			Predicate = Deck.Instance.CurrentShape?.ShapeCells[0].ColorType ==
+			            Deck.Instance.CurrentShape?.ShapeCells[0].CurrentShapeCellUnder?.ColorType;
 		}
 
 		#endregion

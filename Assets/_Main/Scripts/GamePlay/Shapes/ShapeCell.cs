@@ -204,7 +204,7 @@ namespace GamePlay.Shapes
 
 			// destroy neighbour cells and this cell
 			foreach (var shapeCell in neighbours)
-				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack)
+				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.Linear)
 					.OnComplete(() => Destroy(shapeCell.gameObject));
 
 			transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() => Destroy(gameObject));
@@ -236,18 +236,17 @@ namespace GamePlay.Shapes
 			var dir = (position - transform.position).normalized;
 			var dirCrossed = Vector3.Cross(dir, Vector3.forward);
 
-			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetDelay(0.05f).SetEase(Ease.Linear)
-				.OnComplete(() =>
+			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetEase(Ease.Linear).OnComplete(() =>
+			{
+				if (feedback)
 				{
-					if (feedback)
-					{
-						AudioManager.Instance.PlayAudio(AudioName.Fold).SetPitch(1 + index * 0.2f);
-						HapticManager.Instance.PlayHaptic(0.3f, .4f, FOLD_DURATION);
-					}
+					AudioManager.Instance.PlayAudio(AudioName.Fold).SetPitch(1 + index * 0.2f);
+					HapticManager.Instance.PlayHaptic(0.3f, .4f, FOLD_DURATION);
+				}
 
-					ObjectPooler.Instance.Release(separator, SEPARATOR_TAG);
-					IsBusy = false;
-				});
+				ObjectPooler.Instance.Release(separator, SEPARATOR_TAG);
+				IsBusy = false;
+			});
 		}
 
 		public void Blast()
@@ -257,7 +256,7 @@ namespace GamePlay.Shapes
 			Grid.Instance.GetCell(Coordinates).CurrentShapeCell = null;
 
 			OnFoldComplete?.Invoke(ColorType, 1, transform.position);
-			
+
 			Destroy(gameObject);
 		}
 
