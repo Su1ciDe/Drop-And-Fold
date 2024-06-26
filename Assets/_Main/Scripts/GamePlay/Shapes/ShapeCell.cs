@@ -236,17 +236,18 @@ namespace GamePlay.Shapes
 			var dir = (position - transform.position).normalized;
 			var dirCrossed = Vector3.Cross(dir, Vector3.forward);
 
-			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetEase(Ease.Linear).OnComplete(() =>
-			{
-				if (feedback)
+			return separator.transform.DORotate(180 * dirCrossed, FOLD_DURATION).SetDelay(0.05f).SetEase(Ease.Linear)
+				.OnComplete(() =>
 				{
-					AudioManager.Instance.PlayAudio(AudioName.Fold).SetPitch(1 + index * 0.2f);
-					HapticManager.Instance.PlayHaptic(0.3f, .4f, FOLD_DURATION);
-				}
+					if (feedback)
+					{
+						AudioManager.Instance.PlayAudio(AudioName.Fold).SetPitch(1 + index * 0.2f);
+						HapticManager.Instance.PlayHaptic(0.3f, .4f, FOLD_DURATION);
+					}
 
-				ObjectPooler.Instance.Release(separator, SEPARATOR_TAG);
-				IsBusy = false;
-			});
+					ObjectPooler.Instance.Release(separator, SEPARATOR_TAG);
+					IsBusy = false;
+				});
 		}
 
 		public void Blast()
