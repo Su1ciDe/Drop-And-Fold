@@ -43,6 +43,11 @@ namespace Managers
 			Unsub();
 		}
 
+		public void CloseFirstLevelTutorial()
+		{
+			tutorialUI.HideDragToMove();
+		}
+
 		private void OnLevelStarted()
 		{
 			if (LevelManager.Instance.LevelNo.Equals(1))

@@ -73,7 +73,12 @@ namespace GamePlay.Player
 
 			Deck.Instance.CurrentShape.Move(pos.x);
 
-			inputEyeTarget.transform.position = Vector3.Lerp(inputEyeTarget.transform.position, pos + BACK_POS * Vector3.back, Time.deltaTime * DAMPING);
+			inputEyeTarget.transform.position = Vector3.Lerp(inputEyeTarget.transform.position,
+				pos + BACK_POS * Vector3.back, Time.deltaTime * DAMPING);
+			if (LevelManager.Instance.LevelNo == 1)
+			{
+				TutorialManager.Instance.CloseFirstLevelTutorial();
+			}
 		}
 
 		private void OnDragging()
@@ -84,7 +89,8 @@ namespace GamePlay.Player
 
 			Deck.Instance.CurrentShape.Move(pos.x);
 
-			inputEyeTarget.transform.position = Vector3.Lerp(inputEyeTarget.transform.position, pos + BACK_POS * Vector3.back, Time.deltaTime * DAMPING);
+			inputEyeTarget.transform.position = Vector3.Lerp(inputEyeTarget.transform.position,
+				pos + BACK_POS * Vector3.back, Time.deltaTime * DAMPING);
 		}
 
 		private void OnUp()
@@ -97,7 +103,8 @@ namespace GamePlay.Player
 		private Vector3 GetMovePosition()
 		{
 			var mousePos = Input.mousePosition;
-			var pos = Helper.MainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, -Helper.MainCamera.transform.position.z));
+			var pos = Helper.MainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y,
+				-Helper.MainCamera.transform.position.z));
 
 			return pos;
 		}
