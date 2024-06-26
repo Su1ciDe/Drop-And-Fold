@@ -12,8 +12,10 @@ namespace Managers
 {
 	public class GoalManager : Singleton<GoalManager>
 	{
-		[SerializeField, ReadOnly] private SerializedDictionary<ColorType, Goal> goalDictionary = new SerializedDictionary<ColorType, Goal>();
+		[SerializeField, ReadOnly]
+		private SerializedDictionary<ColorType, Goal> goalDictionary = new SerializedDictionary<ColorType, Goal>();
 		public SerializedDictionary<ColorType, Goal> GoalDictionary => goalDictionary;
+		public ParticleSystem destroyParticle;
 
 		private void OnEnable()
 		{
@@ -31,10 +33,19 @@ namespace Managers
 			if (goalDictionary.ContainsKey(ColorType.None))
 			{
 				goal = goalDictionary[ColorType.None];
+				
 			}
 			else
 			{
-				if (!goalDictionary.TryGetValue(colorType, out goal)) return;
+				if (!goalDictionary.TryGetValue(colorType, out goal))
+				{
+					var _destroyParticle = Instantiate(destroyParticle, LevelManager.Instance.CurrentLevel.transform);
+					_destroyParticle.transform.SetParent(LevelManager.Instance.transform);
+					_destroyParticle.transform.position = pos;
+					_destroyParticle.Play();
+					return;
+					
+				}
 			}
 
 			goal.CurrentAmount = Mathf.Clamp(goal.CurrentAmount + count, 0, goal.Amount);

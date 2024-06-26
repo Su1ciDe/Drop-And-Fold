@@ -54,6 +54,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4922829932719842428}
     m_Modifications:
+    - target: {fileID: 362079906621377623, guid: 93ea8dffc14c64afea3874addb4dfb06, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3900681681122700525, guid: 93ea8dffc14c64afea3874addb4dfb06, type: 3}
       propertyPath: m_Name
       value: MoveHereTutorial
@@ -72,7 +76,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8235254540941189787, guid: 93ea8dffc14c64afea3874addb4dfb06, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.25
       objectReference: {fileID: 0}
     - target: {fileID: 8235254540941189787, guid: 93ea8dffc14c64afea3874addb4dfb06, type: 3}
       propertyPath: m_LocalRotation.w

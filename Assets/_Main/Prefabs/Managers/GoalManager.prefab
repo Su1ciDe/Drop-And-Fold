@@ -46,3 +46,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goalDictionary:
     _serializedList: []
+  destroyParticle: {fileID: 19855650, guid: fe394d041df1a0547990f49cf653249f, type: 3}
