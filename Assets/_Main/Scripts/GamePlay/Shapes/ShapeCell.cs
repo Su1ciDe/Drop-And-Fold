@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using AssetKits.ParticleImage;
 using DG.Tweening;
 using Fiber.Managers;
 using Fiber.Utilities;
@@ -204,7 +203,7 @@ namespace GamePlay.Shapes
 
 			// destroy neighbour cells and this cell
 			foreach (var shapeCell in neighbours)
-				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.Linear)
+				shapeCell.transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack)
 					.OnComplete(() => Destroy(shapeCell.gameObject));
 
 			transform.DOScale(0, DESTROY_DURATION).SetEase(Ease.InBack).OnComplete(() => Destroy(gameObject));
