@@ -17,9 +17,9 @@ namespace Models
 		public bool IsBusy { get; set; }
 
 		public static readonly float SIZE = 1;
-		public static float FOLD_DURATION = .2f;
-		protected const float DROP_SPEED = .3f;
-		protected const float DESTROY_DURATION = .2f;
+		public static float FOLD_DURATION = .15f;
+		protected const float DROP_SPEED = .2f;
+		protected const float DESTROY_DURATION = .1f;
 		protected const string SEPARATOR_TAG = "Separator";
 
 		protected const float SQUASH_AMOUNT = .15f;
