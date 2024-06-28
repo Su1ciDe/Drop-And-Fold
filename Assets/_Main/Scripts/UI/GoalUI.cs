@@ -19,8 +19,8 @@ namespace UI
 		private Goal goal;
 		private int currentAmount;
 
-		private const float ICON_MOVE_DURATION = .45F;
-		private const float DELAY = .02F;
+		private const float ICON_MOVE_DURATION = .75F;
+		private const float DELAY = .05F;
 		private const string ICON_TAG = "GoalIcon";
 
 		public event UnityAction<GoalUI> OnComplete;
