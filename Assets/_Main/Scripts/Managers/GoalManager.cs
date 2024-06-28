@@ -15,7 +15,8 @@ namespace Managers
 		[SerializeField, ReadOnly]
 		private SerializedDictionary<ColorType, Goal> goalDictionary = new SerializedDictionary<ColorType, Goal>();
 		public SerializedDictionary<ColorType, Goal> GoalDictionary => goalDictionary;
-		public ParticleSystem destroyParticle;
+
+		private const string SMOKE_PARTICLE_TAG = "Smoke";
 
 		private void OnEnable()
 		{
@@ -33,18 +34,13 @@ namespace Managers
 			if (goalDictionary.ContainsKey(ColorType.None))
 			{
 				goal = goalDictionary[ColorType.None];
-				
 			}
 			else
 			{
 				if (!goalDictionary.TryGetValue(colorType, out goal))
 				{
-					var _destroyParticle = Instantiate(destroyParticle, LevelManager.Instance.CurrentLevel.transform);
-					_destroyParticle.transform.SetParent(LevelManager.Instance.transform);
-					_destroyParticle.transform.position = pos;
-					_destroyParticle.Play();
+					ParticlePooler.Instance.Spawn(SMOKE_PARTICLE_TAG, pos);
 					return;
-					
 				}
 			}
 

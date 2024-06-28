@@ -1,10 +1,13 @@
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using Fiber.UI;
 using Fiber.Managers;
 using Fiber.Utilities.Extensions;
 using GamePlay.Shapes;
+using ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Utilities
 {
@@ -64,10 +67,11 @@ namespace Utilities
 
 		private IEnumerator PlayAnimation()
 		{
+			var tempMats = new Dictionary<ColorType, ColorDataSO.ColorData>(GameManager.Instance.ColorDataSO.ColorDatas);
+			tempMats.Remove(ColorType.None);
 			while (isActiveAndEnabled)
 			{
-				var r = COLOR_TYPE.RandomItem();
-				var mat = GameManager.Instance.ColorDataSO.ColorDatas[r].Material;
+				var mat = tempMats.PickRandomValue().Material;
 				middleCell.SetupMaterials(mat);
 				for (var i = 0; i < neighbourCells.Length; i++)
 				{

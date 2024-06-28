@@ -32,7 +32,7 @@ namespace Fiber.LevelSystem
 		private int currentMoveCount;
 
 		private int currentTime;
-		private readonly WaitForSeconds waitTimer = new WaitForSeconds(1);
+		private readonly WaitForSeconds waitTimer = new WaitForSeconds(0.5f);
 		private Coroutine timerCoroutine;
 
 		public event UnityAction<int> OnTimerTick;
@@ -106,9 +106,17 @@ namespace Fiber.LevelSystem
 		{
 			if (LevelType == LevelType.MoveCount)
 			{
-				StartCoroutine(OnFoldCompleteCoroutine());
+				if (foldCompleteCoroutine is not null)
+				{
+					StopCoroutine(foldCompleteCoroutine);
+					foldCompleteCoroutine = null;
+				}
+
+				foldCompleteCoroutine = StartCoroutine(OnFoldCompleteCoroutine());
 			}
 		}
+
+		private Coroutine foldCompleteCoroutine;
 
 		private IEnumerator OnFoldCompleteCoroutine()
 		{
@@ -116,11 +124,14 @@ namespace Fiber.LevelSystem
 
 			if (currentMoveCount > 0) yield break;
 
-			yield return new WaitUntil(() => Grid.Instance.IsAnyCellBusy());
-			yield return waitTimer;
-			yield return new WaitUntil(() => Grid.Instance.IsAnyCellBusy());
+			do
+			{
+				yield return waitTimer;
+			} while (Grid.Instance.IsAnyCellBusy());
+
 			yield return null;
-			
+			yield return new WaitUntil(() => !Grid.Instance.IsAnyCellBusy());
+
 			LevelManager.Instance.Lose();
 		}
 

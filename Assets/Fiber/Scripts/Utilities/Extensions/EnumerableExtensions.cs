@@ -257,7 +257,7 @@ namespace Fiber.Utilities.Extensions
 
 			var randomKey = values.Keys.ElementAt(rand.Next(0, values.Count));
 			var randomValue = values[randomKey];
-			values.Remove(randomKey);
+			dictionary.Remove(randomKey);
 			return randomValue;
 		}
 

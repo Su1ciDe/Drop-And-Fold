@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 361411365374760053, guid: 022c6366aeef84a56a3fccb88eda428a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6845929376342375551, guid: 022c6366aeef84a56a3fccb88eda428a, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -92,9 +96,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 610dd83c9d854536b149596c04846372, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <ColorType>k__BackingField: 0
   <Coordinates>k__BackingField: {x: 0, y: 0}
+  offset: {x: 0, y: 0, z: 0}
   <ShapeCoordinates>k__BackingField: {x: 0, y: 0}
+  <ColorType>k__BackingField: 0
   <CurrentObstacle>k__BackingField: {fileID: 0}
   meshRenderers:
   - {fileID: 8571837069457434595}

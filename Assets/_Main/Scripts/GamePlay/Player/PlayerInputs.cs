@@ -17,7 +17,7 @@ namespace GamePlay.Player
 
 		private bool isDown = false;
 
-		private const float BACK_POS = 6;
+		private const float BACK_POS = 5;
 		private const float DAMPING = 6;
 
 		public static event UnityAction<Vector3> OnMouseDown;
